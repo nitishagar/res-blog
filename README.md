@@ -5,7 +5,7 @@ A clean, responsive portfolio website designed for hosting on AWS Amplify.
 ## Features
 
 - Responsive design that works on all devices
-- Resume/CV section with professional experience
+- Resume/CV section with education and skills
 - Portfolio section for showcasing projects
 - Blog section for technical articles
 - Smooth scrolling navigation
@@ -92,7 +92,7 @@ The Node.js test suite checks:
 
 ### Personal Information
 The portfolio is already populated with content from resume.tex. To update:
-- Edit professional experience in the Experience section
+- Edit professional information in the relevant sections
 - Update LinkedIn and GitHub profile URLs in the Contact section
 - Modify project descriptions in the Portfolio section
 - Add new blog posts or link to specific Medium articles
