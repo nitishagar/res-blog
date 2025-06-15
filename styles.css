@@ -582,15 +582,111 @@ section {
 }
 
 .contact-content {
-    max-width: 600px;
+    max-width: 900px;
     margin: 0 auto;
     text-align: center;
 }
 
-.contact-content p {
-    font-size: 1.125rem;
+.contact-intro {
+    font-size: 1.25rem;
     color: var(--text-light);
+    margin-bottom: 3rem;
+    line-height: 1.8;
+}
+
+.credentials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.credential-card {
+    background: var(--bg-white);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.credential-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.credential-icon {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.credential-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+}
+
+.credential-card p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.contact-cta {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 3rem;
+    border-radius: 1rem;
+    color: white;
+    box-shadow: var(--shadow-lg);
+}
+
+.contact-cta h3 {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+}
+
+.contact-cta p {
+    font-size: 1.125rem;
     margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.contact-links {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: background 0.3s ease, transform 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.contact-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.contact-btn.primary {
+    background: white;
+    color: #667eea;
+}
+
+.contact-btn.primary:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.contact-icon {
+    width: 20px;
+    height: 20px;
 }
 
 .contact-info {
@@ -612,11 +708,6 @@ section {
 
 .contact-link:hover {
     color: var(--secondary-color);
-}
-
-.contact-icon {
-    width: 24px;
-    height: 24px;
 }
 
 /* Footer */
@@ -693,5 +784,23 @@ section {
 
     .contact-info {
         align-items: flex-start;
+    }
+    
+    .credentials-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .contact-cta {
+        padding: 2rem;
+    }
+    
+    .contact-links {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .contact-btn {
+        text-align: center;
+        justify-content: center;
     }
 }
