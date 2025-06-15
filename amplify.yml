@@ -1,0 +1,12 @@
+version: 1
+frontend:
+  phases:
+    # IMPORTANT - No build phase needed for a static website
+    # AWS Amplify will automatically serve static files
+  artifacts:
+    # Include all files needed for the static website
+    baseDirectory: /
+    files:
+      - '**/*'
+  cache:
+    paths: []

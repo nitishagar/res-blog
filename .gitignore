@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+logs
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*.temp
+
+# Build artifacts (if any future build process is added)
+dist/
+build/

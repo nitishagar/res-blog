@@ -1,0 +1,17 @@
+{
+  "name": "res-blog",
+  "version": "1.0.0",
+  "description": "Personal portfolio website",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js",
+    "serve": "node server.js",
+    "test": "node test.js",
+    "test:browser": "open test.html"
+  },
+  "keywords": ["portfolio", "resume", "personal-website"],
+  "author": "Nitish Agarwal",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}

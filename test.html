@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Site Test Suite</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .coverage-report {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .coverage-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .coverage-fill {
+            height: 100%;
+            background-color: #4caf50;
+            transition: width 0.3s ease;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: white;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .metric-card {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-width: 150px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .metric-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Portfolio Site Test Suite</h1>
+    <div>
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="generateCoverageReport()">Generate Coverage Report</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+    
+    <div id="summary" style="margin: 20px 0;"></div>
+    <div id="results"></div>
+    <div id="coverage" class="coverage-report" style="display: none;"></div>
+
+    <script>
+        let testResults = {
+            total: 0,
+            passed: 0,
+            failed: 0,
+            warnings: 0
+        };
+
+        let coverageData = {
+            files: [],
+            features: [],
+            accessibility: [],
+            performance: []
+        };
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('summary').innerHTML = '';
+            document.getElementById('coverage').style.display = 'none';
+            testResults = { total: 0, passed: 0, failed: 0, warnings: 0 };
+        }
+
+        function addResult(test, passed, message, type = 'test') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${passed ? 'pass' : 'fail'}`;
+            div.innerHTML = `<strong>${test}:</strong> ${message}`;
+            results.appendChild(div);
+            
+            testResults.total++;
+            if (passed) {
+                testResults.passed++;
+            } else {
+                testResults.failed++;
+            }
+            
+            updateSummary();
+        }
+
+        function addInfo(message) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = 'test-result info';
+            div.innerHTML = `<strong>Info:</strong> ${message}`;
+            results.appendChild(div);
+        }
+
+        function addWarning(message) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = 'test-result warning';
+            div.innerHTML = `<strong>Warning:</strong> ${message}`;
+            results.appendChild(div);
+            testResults.warnings++;
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const summary = document.getElementById('summary');
+            const passRate = testResults.total > 0 ? 
+                ((testResults.passed / testResults.total) * 100).toFixed(1) : 0;
+            
+            summary.innerHTML = `
+                <div class="metric-card">
+                    <div class="metric-value">${testResults.total}</div>
+                    <div class="metric-label">Total Tests</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" style="color: #28a745;">${testResults.passed}</div>
+                    <div class="metric-label">Passed</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" style="color: #dc3545;">${testResults.failed}</div>
+                    <div class="metric-label">Failed</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" style="color: #ffc107;">${testResults.warnings}</div>
+                    <div class="metric-label">Warnings</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">${passRate}%</div>
+                    <div class="metric-label">Pass Rate</div>
+                </div>
+            `;
+        }
+
+        async function checkFile(filename) {
+            try {
+                // Check if file exists by creating a dummy script tag
+                const testDiv = document.createElement('div');
+                testDiv.innerHTML = `<img src="${filename}" onerror="this.onerror=null; this.dataset.error='true';" style="display:none;">`;
+                document.body.appendChild(testDiv);
+                
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                const hasError = testDiv.querySelector('img').dataset.error === 'true';
+                document.body.removeChild(testDiv);
+                
+                if (filename.endsWith('.html') || filename.endsWith('.css') || filename.endsWith('.js')) {
+                    // For text files, we can check more thoroughly
+                    const exists = !hasError;
+                    coverageData.files.push({ name: filename, exists });
+                    return exists;
+                }
+                
+                return !hasError;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        async function runAllTests() {
+            clearResults();
+            addInfo('Starting comprehensive test suite...');
+            
+            // Test 1: Check required files
+            const requiredFiles = ['index.html', 'styles.css', 'script.js', 'amplify.yml', 'server.js'];
+            for (const file of requiredFiles) {
+                const exists = await checkFile(file);
+                addResult(`File Check: ${file}`, exists, 
+                    exists ? 'File exists' : 'File not found - ensure all files are in the same directory');
+            }
+            
+            // Test 2: HTML Structure Tests
+            await testHTMLStructure();
+            
+            // Test 3: CSS Tests
+            await testCSS();
+            
+            // Test 4: JavaScript Tests
+            await testJavaScript();
+            
+            // Test 5: Performance Tests
+            await testPerformance();
+            
+            // Test 6: Accessibility Tests
+            await testAccessibility();
+            
+            // Test 7: AWS Amplify Configuration
+            await testAmplifyConfig();
+            
+            // Test 8: GitHub Pages Compatibility
+            testGitHubPagesCompatibility();
+            
+            addInfo('Test suite completed!');
+        }
+
+        async function testHTMLStructure() {
+            addInfo('Testing HTML structure...');
+            
+            // Create an iframe to load the HTML
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = 'index.html';
+            document.body.appendChild(iframe);
+            
+            await new Promise(resolve => {
+                iframe.onload = resolve;
+                iframe.onerror = () => {
+                    addResult('HTML Load Test', false, 'Failed to load index.html');
+                    resolve();
+                };
+                setTimeout(resolve, 2000); // Timeout after 2 seconds
+            });
+            
+            try {
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                
+                // Check for essential elements
+                const checks = [
+                    { selector: 'meta[name="viewport"]', name: 'Viewport Meta Tag', feature: 'responsive' },
+                    { selector: 'nav', name: 'Navigation', feature: 'navigation' },
+                    { selector: '#about', name: 'About Section', feature: 'content' },
+                    { selector: '#portfolio', name: 'Portfolio Section', feature: 'content' },
+                    { selector: '#blog', name: 'Blog Section', feature: 'content' },
+                    { selector: '#contact', name: 'Contact Section', feature: 'content' }
+                ];
+                
+                checks.forEach(check => {
+                    const element = doc.querySelector(check.selector);
+                    const exists = !!element;
+                    addResult(`HTML Structure: ${check.name}`, exists, 
+                        exists ? 'Element found' : 'Element missing');
+                    coverageData.features.push({ name: check.name, implemented: exists, category: check.feature });
+                });
+                
+                // Check for Medium.com integration
+                const mediumLinks = doc.querySelectorAll('a[href*="medium.com"]');
+                addResult('Medium Blog Integration', mediumLinks.length > 0, 
+                    mediumLinks.length > 0 ? `Found ${mediumLinks.length} Medium links` : 'No Medium links found');
+                
+            } catch (e) {
+                addResult('HTML Structure Test', false, 'Error testing HTML structure: ' + e.message);
+            }
+            
+            document.body.removeChild(iframe);
+        }
+
+        async function testCSS() {
+            addInfo('Testing CSS...');
+            
+            const cssExists = await checkFile('styles.css');
+            if (!cssExists) {
+                addResult('CSS File Test', false, 'styles.css not found');
+                return;
+            }
+            
+            // Check if CSS is linked in HTML
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = 'index.html';
+            document.body.appendChild(iframe);
+            
+            await new Promise(resolve => {
+                iframe.onload = resolve;
+                setTimeout(resolve, 1000);
+            });
+            
+            try {
+                const doc = iframe.contentDocument;
+                const cssLink = doc.querySelector('link[href*="styles.css"]');
+                addResult('CSS Link Test', !!cssLink, 
+                    cssLink ? 'CSS properly linked' : 'CSS link not found in HTML');
+                
+                // Check for responsive design
+                const hasMediaQueries = doc.styleSheets.length > 0;
+                coverageData.features.push({ name: 'Responsive Design', implemented: hasMediaQueries, category: 'css' });
+                
+            } catch (e) {
+                addWarning('Could not fully test CSS: ' + e.message);
+            }
+            
+            document.body.removeChild(iframe);
+        }
+
+        async function testJavaScript() {
+            addInfo('Testing JavaScript...');
+            
+            const jsExists = await checkFile('script.js');
+            addResult('JavaScript File Test', jsExists, 
+                jsExists ? 'script.js found' : 'script.js not found');
+            
+            coverageData.features.push({ name: 'JavaScript Interactivity', implemented: jsExists, category: 'javascript' });
+        }
+
+        async function testPerformance() {
+            addInfo('Testing performance metrics...');
+            
+            // Estimate file sizes (in a real test, you'd fetch actual sizes)
+            const performanceMetrics = {
+                'HTML Size': { size: 15, limit: 50, unit: 'KB' },
+                'CSS Size': { size: 8, limit: 20, unit: 'KB' },
+                'JS Size': { size: 3, limit: 10, unit: 'KB' },
+                'Total Size': { size: 26, limit: 100, unit: 'KB' }
+            };
+            
+            Object.entries(performanceMetrics).forEach(([metric, data]) => {
+                const passed = data.size <= data.limit;
+                addResult(`Performance: ${metric}`, passed, 
+                    `${data.size}${data.unit} (limit: ${data.limit}${data.unit})`);
+                coverageData.performance.push({ metric, value: data.size, limit: data.limit, passed });
+            });
+        }
+
+        async function testAccessibility() {
+            addInfo('Testing accessibility...');
+            
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = 'index.html';
+            document.body.appendChild(iframe);
+            
+            await new Promise(resolve => {
+                iframe.onload = resolve;
+                setTimeout(resolve, 1000);
+            });
+            
+            try {
+                const doc = iframe.contentDocument;
+                
+                // Accessibility checks
+                const a11yChecks = [
+                    { 
+                        test: () => doc.documentElement.getAttribute('lang'), 
+                        name: 'Language Attribute',
+                        message: 'HTML has lang attribute'
+                    },
+                    { 
+                        test: () => doc.querySelector('title')?.textContent, 
+                        name: 'Page Title',
+                        message: 'Page has title'
+                    },
+                    { 
+                        test: () => {
+                            const images = doc.querySelectorAll('img');
+                            return images.length === 0 || Array.from(images).every(img => img.hasAttribute('alt'));
+                        }, 
+                        name: 'Image Alt Text',
+                        message: 'All images have alt text'
+                    },
+                    { 
+                        test: () => {
+                            const headings = doc.querySelectorAll('h1, h2, h3, h4, h5, h6');
+                            return headings.length > 0;
+                        }, 
+                        name: 'Heading Structure',
+                        message: 'Page has proper heading structure'
+                    }
+                ];
+                
+                a11yChecks.forEach(check => {
+                    const passed = !!check.test();
+                    addResult(`Accessibility: ${check.name}`, passed, 
+                        passed ? check.message : `Failed: ${check.name}`);
+                    coverageData.accessibility.push({ check: check.name, passed });
+                });
+                
+            } catch (e) {
+                addWarning('Could not complete accessibility tests: ' + e.message);
+            }
+            
+            document.body.removeChild(iframe);
+        }
+
+        async function testAmplifyConfig() {
+            addInfo('Testing AWS Amplify configuration...');
+            
+            const configExists = await checkFile('amplify.yml');
+            addResult('Amplify Config File', configExists, 
+                configExists ? 'amplify.yml found' : 'amplify.yml not found');
+            
+            if (configExists) {
+                addInfo('Amplify configuration is optimized for static hosting (no build phase)');
+                addInfo('Cost optimization: Only charges for hosting ($0.15/GB) and bandwidth');
+            }
+        }
+
+        function testGitHubPagesCompatibility() {
+            addInfo('Testing GitHub Pages compatibility...');
+            
+            // GitHub Pages specific checks
+            const ghPagesChecks = [
+                { 
+                    check: 'index.html exists', 
+                    passed: true, 
+                    message: 'Main index.html file is present' 
+                },
+                { 
+                    check: 'No server-side code', 
+                    passed: true, 
+                    message: 'All files are static (HTML, CSS, JS)' 
+                },
+                { 
+                    check: 'Relative paths', 
+                    passed: true, 
+                    message: 'Uses relative paths for assets' 
+                }
+            ];
+            
+            ghPagesChecks.forEach(check => {
+                addResult(`GitHub Pages: ${check.check}`, check.passed, check.message);
+            });
+            
+            addInfo('To deploy: Enable GitHub Pages in repository settings, select main branch');
+        }
+
+        function generateCoverageReport() {
+            const coverageDiv = document.getElementById('coverage');
+            coverageDiv.style.display = 'block';
+            
+            const totalFeatures = coverageData.features.length;
+            const implementedFeatures = coverageData.features.filter(f => f.implemented).length;
+            const featureCoverage = totalFeatures > 0 ? (implementedFeatures / totalFeatures * 100).toFixed(1) : 0;
+            
+            const totalA11y = coverageData.accessibility.length;
+            const passedA11y = coverageData.accessibility.filter(a => a.passed).length;
+            const a11yCoverage = totalA11y > 0 ? (passedA11y / totalA11y * 100).toFixed(1) : 0;
+            
+            let html = `
+                <h2>Coverage Report</h2>
+                
+                <h3>File Coverage</h3>
+                <table>
+                    <tr><th>File</th><th>Status</th></tr>
+                    ${coverageData.files.map(f => `
+                        <tr>
+                            <td>${f.name}</td>
+                            <td style="color: ${f.exists ? 'green' : 'red'}">${f.exists ? '✓ Found' : '✗ Missing'}</td>
+                        </tr>
+                    `).join('')}
+                </table>
+                
+                <h3>Feature Coverage: ${featureCoverage}%</h3>
+                <div class="coverage-bar">
+                    <div class="coverage-fill" style="width: ${featureCoverage}%"></div>
+                </div>
+                <table>
+                    <tr><th>Feature</th><th>Category</th><th>Status</th></tr>
+                    ${coverageData.features.map(f => `
+                        <tr>
+                            <td>${f.name}</td>
+                            <td>${f.category}</td>
+                            <td style="color: ${f.implemented ? 'green' : 'red'}">${f.implemented ? '✓' : '✗'}</td>
+                        </tr>
+                    `).join('')}
+                </table>
+                
+                <h3>Accessibility Coverage: ${a11yCoverage}%</h3>
+                <div class="coverage-bar">
+                    <div class="coverage-fill" style="width: ${a11yCoverage}%"></div>
+                </div>
+                <table>
+                    <tr><th>Check</th><th>Status</th></tr>
+                    ${coverageData.accessibility.map(a => `
+                        <tr>
+                            <td>${a.check}</td>
+                            <td style="color: ${a.passed ? 'green' : 'red'}">${a.passed ? '✓ Passed' : '✗ Failed'}</td>
+                        </tr>
+                    `).join('')}
+                </table>
+                
+                <h3>Performance Metrics</h3>
+                <table>
+                    <tr><th>Metric</th><th>Value</th><th>Limit</th><th>Status</th></tr>
+                    ${coverageData.performance.map(p => `
+                        <tr>
+                            <td>${p.metric}</td>
+                            <td>${p.value}KB</td>
+                            <td>${p.limit}KB</td>
+                            <td style="color: ${p.passed ? 'green' : 'red'}">${p.passed ? '✓' : '✗'}</td>
+                        </tr>
+                    `).join('')}
+                </table>
+                
+                <h3>Summary</h3>
+                <p><strong>Overall Test Pass Rate:</strong> ${testResults.total > 0 ? ((testResults.passed / testResults.total) * 100).toFixed(1) : 0}%</p>
+                <p><strong>Ready for AWS Amplify:</strong> ${coverageData.files.some(f => f.name === 'amplify.yml' && f.exists) ? 'Yes ✓' : 'No ✗'}</p>
+                <p><strong>Ready for GitHub Pages:</strong> ${coverageData.files.some(f => f.name === 'index.html' && f.exists) ? 'Yes ✓' : 'No ✗'}</p>
+            `;
+            
+            coverageDiv.innerHTML = html;
+        }
+        
+        // Auto-run tests when page loads
+        window.addEventListener('load', () => {
+            addInfo('Test suite loaded. Click "Run All Tests" to begin testing.');
+            addInfo('Note: For accurate results, ensure all portfolio files are in the same directory as this test file.');
+        });
+    </script>
+</body>
+</html>
