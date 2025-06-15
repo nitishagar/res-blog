@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Status
 
-The res-blog directory contains a personal portfolio website designed for static hosting on AWS Amplify. It showcases professional experience, education, skills, and projects.
+The res-blog directory contains a personal portfolio website designed for static hosting on AWS Amplify. It showcases education, skills, and projects.
 
 ## Repository Context
 
