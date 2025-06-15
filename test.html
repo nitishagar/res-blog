@@ -332,6 +332,36 @@
                 addResult('GitHub Profile Link', !!githubLink, 
                     githubLink ? 'Correct GitHub profile linked' : 'GitHub profile not found');
                 
+                // Check LinkedIn link
+                const linkedinLink = doc.querySelector('a[href*="linkedin.com/in/agarwalnitish"]');
+                addResult('LinkedIn Profile Link', !!linkedinLink, 
+                    linkedinLink ? 'Correct LinkedIn profile linked' : 'LinkedIn profile not found or incorrect');
+                
+                // Check for credential cards in contact section
+                const credentialCards = doc.querySelectorAll('.credential-card');
+                addResult('Contact Section: Credential Cards', credentialCards.length === 4, 
+                    credentialCards.length === 4 ? 'All 4 credential cards found' : `Found ${credentialCards.length} credential cards, expected 4`);
+                
+                // Check for contact CTA
+                const contactCTA = doc.querySelector('.contact-cta');
+                addResult('Contact Section: CTA Box', !!contactCTA, 
+                    contactCTA ? 'Contact CTA section found' : 'Contact CTA section missing');
+                
+                // Check for contact buttons
+                const contactButtons = doc.querySelectorAll('.contact-btn');
+                addResult('Contact Section: Contact Buttons', contactButtons.length === 4, 
+                    contactButtons.length === 4 ? 'All 4 contact buttons found' : `Found ${contactButtons.length} contact buttons, expected 4`);
+                
+                // Check that Sr. Engineering Manager is removed
+                const hasOldTitle = html.includes('Sr. Engineering Manager');
+                addResult('Hero Section: Title Update', !hasOldTitle, 
+                    !hasOldTitle ? 'Sr. Engineering Manager removed successfully' : 'Old title still present');
+                
+                // Check that education section is removed
+                const hasEducationSection = doc.querySelector('#education');
+                addResult('Education Section Removal', !hasEducationSection, 
+                    !hasEducationSection ? 'Education section successfully removed' : 'Education section still exists');
+                
             } catch (e) {
                 addResult('HTML Structure Test', false, 'Error testing HTML structure: ' + e.message);
             }
@@ -369,9 +399,25 @@
                     addResult('CSS: Animations', hasAnimations, 
                         hasAnimations ? 'Animations implemented' : 'No animations found');
                     
+                    // Check for new contact section styles
+                    const hasCredentialStyles = css.includes('.credential-card');
+                    addResult('CSS: Credential Card Styles', hasCredentialStyles, 
+                        hasCredentialStyles ? 'Credential card styles found' : 'Credential card styles missing');
+                    
+                    const hasContactCTAStyles = css.includes('.contact-cta');
+                    addResult('CSS: Contact CTA Styles', hasContactCTAStyles, 
+                        hasContactCTAStyles ? 'Contact CTA styles found' : 'Contact CTA styles missing');
+                    
+                    const hasContactBtnStyles = css.includes('.contact-btn');
+                    addResult('CSS: Contact Button Styles', hasContactBtnStyles, 
+                        hasContactBtnStyles ? 'Contact button styles found' : 'Contact button styles missing');
+                    
                     coverageData.features.push({ name: 'Responsive Design', implemented: hasMediaQueries, category: 'css' });
                     coverageData.features.push({ name: 'CSS Variables', implemented: hasVariables, category: 'css' });
                     coverageData.features.push({ name: 'CSS Animations', implemented: hasAnimations, category: 'css' });
+                    coverageData.features.push({ name: 'Credential Styles', implemented: hasCredentialStyles, category: 'css' });
+                    coverageData.features.push({ name: 'Contact CTA Styles', implemented: hasContactCTAStyles, category: 'css' });
+                    coverageData.features.push({ name: 'Contact Button Styles', implemented: hasContactBtnStyles, category: 'css' });
                 } else {
                     addResult('CSS: Features Test', true, 'Assumed working (file:// mode)');
                     coverageData.features.push({ name: 'Responsive Design', implemented: true, category: 'css' });
