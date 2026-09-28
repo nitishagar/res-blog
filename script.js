@@ -15,7 +15,9 @@ navLinks.forEach(link => {
     });
 });
 
-// Smooth Scrolling
+// Smooth Scrolling (respect reduced motion)
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
@@ -25,7 +27,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             const targetPosition = target.offsetTop - navHeight;
             window.scrollTo({
                 top: targetPosition,
-                behavior: 'smooth'
+                behavior: prefersReducedMotion ? 'auto' : 'smooth'
             });
         }
     });
@@ -53,23 +55,13 @@ window.addEventListener('scroll', () => {
     });
 });
 
-// Navbar Shadow on Scroll
-window.addEventListener('scroll', () => {
-    const navbar = document.querySelector('.navbar');
-    if (window.scrollY > 0) {
-        navbar.style.boxShadow = 'var(--shadow-lg)';
-    } else {
-        navbar.style.boxShadow = 'var(--shadow)';
-    }
-});
-
 // Typewriter effect
 const typewriterEl = document.getElementById('typewriter');
 const phrases = [
-    'Engineering Executive',
-    'AI Systems Architect',
-    'Platform & Scale Leader',
-    'Team Builder'
+    'Engineering leader, GoDaddy Commerce',
+    'I write about agent reliability',
+    'Evals before prompts. Queues before agents.',
+    'Org builder: 25 to 120+ engineers'
 ];
 let phraseIndex = 0;
 let charIndex = 0;
@@ -77,35 +69,43 @@ let isDeleting = false;
 
 function typeWrite() {
     if (!typewriterEl) return;
+    if (prefersReducedMotion) {
+        typewriterEl.textContent = phrases[0];
+        return;
+    }
     const current = phrases[phraseIndex];
     typewriterEl.textContent = isDeleting
         ? current.slice(0, charIndex - 1)
         : current.slice(0, charIndex + 1);
     isDeleting ? charIndex-- : charIndex++;
 
-    let speed = isDeleting ? 45 : 85;
+    let speed = isDeleting ? 35 : 60;
     if (!isDeleting && charIndex === current.length) {
-        speed = 2200;
+        speed = 2400;
         isDeleting = true;
     } else if (isDeleting && charIndex === 0) {
         isDeleting = false;
         phraseIndex = (phraseIndex + 1) % phrases.length;
-        speed = 350;
+        speed = 400;
     }
     setTimeout(typeWrite, speed);
 }
 typeWrite();
 
-// Scroll reveal
-const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('revealed');
-        }
-    });
-}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+// Scroll reveal (skipped entirely under reduced motion via CSS)
+if (!prefersReducedMotion) {
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
 
-document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+} else {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('revealed'));
+}
 
 // Animated counters
 const counterObserver = new IntersectionObserver((entries) => {
@@ -113,8 +113,12 @@ const counterObserver = new IntersectionObserver((entries) => {
         if (entry.isIntersecting && !entry.target.dataset.counted) {
             entry.target.dataset.counted = 'true';
             const target = parseInt(entry.target.dataset.target);
-            const steps = 55;
-            const duration = 1600;
+            if (prefersReducedMotion) {
+                entry.target.textContent = target;
+                return;
+            }
+            const steps = 45;
+            const duration = 1400;
             let step = 0;
             const timer = setInterval(() => {
                 step++;

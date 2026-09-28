@@ -92,7 +92,7 @@ async function testHTMLContent() {
             { pattern: /<meta.*viewport/i, name: 'Viewport meta tag' },
             { pattern: /<nav/i, name: 'Navigation element' },
             { pattern: /id="about"/i, name: 'About section' },
-            { pattern: /id="experience"/i, name: 'Experience section' },
+            { pattern: /leadership-snapshot|leadership-card/i, name: 'Leadership snapshot (replaced Experience section in 4bd1e66)' },
             { pattern: /id="portfolio"/i, name: 'Portfolio section' },
             { pattern: /id="blog"/i, name: 'Blog section' },
             { pattern: /id="contact"/i, name: 'Contact section' },

@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nitish Agarwal - Portfolio</title>
+    <title>Nitish Agarwal — Engineering Leader, AI Systems</title>
+    <meta name="description" content="Nitish Agarwal leads GoDaddy's Commerce Experience tribe and writes about shipping AI agents that survive production: evals, escalation queues, and multi-agent reliability.">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
         <nav class="navbar">
             <div class="nav-container">
-                <a href="#home" class="logo">Nitish Agarwal</a>
+                <a href="#home" class="logo">Nitish Agarwal<span class="logo-dot">.</span></a>
                 <ul class="nav-menu">
                     <li><a href="#about" class="nav-link">About</a></li>
-                    <li><a href="#portfolio" class="nav-link">Portfolio</a></li>
-                    <li><a href="#blog" class="nav-link">Blog</a></li>
+                    <li><a href="#portfolio" class="nav-link">Work</a></li>
+                    <li><a href="#blog" class="nav-link">Writing</a></li>
                     <li><a href="#contact" class="nav-link">Contact</a></li>
+                    <li><a href="https://github.com/nitishagar" class="nav-link nav-cta" target="_blank" rel="noopener noreferrer">GitHub ↗</a></li>
                 </ul>
                 <div class="hamburger">
                     <span class="bar"></span>
@@ -31,13 +33,30 @@
 
     <main>
         <section id="home" class="hero">
-            <div class="container">
-                <h1 class="hero-title">Nitish Agarwal</h1>
-                <p class="hero-subtitle"><span id="typewriter"></span><span class="typewriter-cursor"></span></p>
-                <p class="hero-description">Driving AI transformation and building high-performance engineering organizations at scale</p>
-                <div class="hero-cta">
-                    <a href="#contact" class="btn btn-primary">Get In Touch</a>
-                    <a href="#portfolio" class="btn btn-secondary">View Work</a>
+            <div class="container hero-grid">
+                <div class="hero-copy">
+                    <p class="mono-kicker"><span class="status-dot"></span>Engineering leader · GoDaddy Commerce · Shipping AI agents in production</p>
+                    <h1 class="hero-title">I ship AI agents that survive production.</h1>
+                    <p class="hero-subtitle"><span id="typewriter"></span><span class="typewriter-cursor"></span></p>
+                    <p class="hero-description">I lead GoDaddy's Commerce Experience tribe — CASA, a commerce assistant for 20M+ merchants, and an AI transformation worth $15M+ in revenue and $5M+ in yearly savings. I write about the scars: evals, escalation queues, and the review bottleneck nobody demos.</p>
+                    <div class="hero-cta">
+                        <a href="#blog" class="btn btn-primary">Read the latest writing</a>
+                        <a href="https://nitishagar.medium.com" class="text-link" target="_blank" rel="noopener noreferrer">nitishagar.medium.com →</a>
+                    </div>
+                </div>
+                <div class="hero-terminal" aria-label="Eval replay terminal example">
+                    <div class="terminal-bar">
+                        <span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span>
+                        <span class="terminal-title">eval-replay — gold-traces/</span>
+                    </div>
+                    <pre class="terminal-body"><code><span class="t-dim">$</span> eval replay --corpus gold-traces/ --diff
+<span class="t-dim">running 42 traces against harness v18…</span>
+
+<span class="t-green">✓</span> deterministic checks ....... 42/42
+<span class="t-green">✓</span> judge delta ................ +6 pts
+<span class="t-amber">!</span> cost-per-success .......... +9%
+<span class="t-dim">12 decision diffs on summarization,</span>
+<span class="t-dim">0 vibe-shifts. ship it.</span></code></pre>
                 </div>
             </div>
         </section>
@@ -47,19 +66,19 @@
                 <div class="stats-grid">
                     <div class="stat-item">
                         <div class="stat-value"><span class="stat-number" data-target="15">0</span>+</div>
-                        <div class="stat-label">Years Experience</div>
+                        <div class="stat-label">Years shipping software</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value"><span class="stat-number" data-target="120">0</span>+</div>
-                        <div class="stat-label">Engineers Scaled</div>
+                        <div class="stat-label">Engineers led &amp; scaled</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value">$<span class="stat-number" data-target="15">0</span>M+</div>
-                        <div class="stat-label">Revenue Delivered</div>
+                        <div class="stat-label">Revenue delivered</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value"><span class="stat-number" data-target="80">0</span>M+</div>
-                        <div class="stat-label">Monthly Users Served</div>
+                        <div class="stat-label">Monthly users served</div>
                     </div>
                 </div>
             </div>
@@ -67,133 +86,110 @@
 
         <section id="about" class="about">
             <div class="container">
-                <h2 class="section-title reveal">About Me</h2>
-                <div class="about-content reveal">
-                    <div class="about-text">
-                        <p>I'm an engineering executive with 15+ years building and scaling high-performance technology organizations from 25 to 120+ engineers. At GoDaddy I lead the Commerce Experience tribe, building CASA — an LLM-powered commerce assistant for 20M+ merchants — while driving AI transformation that has delivered $15M+ incremental revenue and $5M+ annual cost savings.</p>
-                        <p>My experience spans GoDaddy, Skyscanner, Expedia, Balena, and Samsung, architecting systems supporting 80M+ monthly users with 99.9%+ uptime. I hold an MBA from City University of London, an M.Eng from University of Waterloo, and AWS certifications in Solutions Architecture and Machine Learning.</p>
+                <p class="section-index reveal">01 — About</p>
+                <h2 class="section-title reveal">An engineer who ended up leading engineers.</h2>
+                <div class="about-grid">
+                    <div class="about-text reveal">
+                        <p>I started in distributed systems and performance work — the kind where a 3,000ms search becomes a 200ms one and conversion jumps 15%. These days I run the Commerce Experience tribe at GoDaddy: 120+ engineers across POS, mobile, checkout, and catalog, plus CASA, our LLM-powered commerce assistant, with a multi-agent QA platform testing it around the clock.</p>
+                        <p>The thread through 15 years at GoDaddy, Skyscanner, Expedia, Balena, and Samsung: I like systems that hold up at 3am. 80M+ monthly users, 99.9%+ uptime, and rollbacks that are one click — because I've been the person getting paged.</p>
+                        <p>Off-hours I build open-source agent tooling and write a series on agent reliability — evals, judges, escalation queues — read by engineers who are tired of demos that never ship.</p>
                         <div class="skills">
-                            <h3>Technical Expertise</h3>
+                            <h3>What I work on</h3>
                             <div class="skill-tags">
                                 <span class="skill-tag">Multi-Agent AI Systems</span>
-                                <span class="skill-tag">GenAI / LLM</span>
-                                <span class="skill-tag">Agentic AI</span>
-                                <span class="skill-tag">Cloud Architecture (AWS / Azure / GCP)</span>
+                                <span class="skill-tag">Agent Evals &amp; Reliability</span>
+                                <span class="skill-tag">GenAI / LLM Platforms</span>
+                                <span class="skill-tag">Engineering Leadership</span>
                                 <span class="skill-tag">Platform Engineering</span>
+                                <span class="skill-tag">Cloud (AWS / Azure / GCP)</span>
                                 <span class="skill-tag">Kubernetes</span>
-                                <span class="skill-tag">Data Engineering</span>
                                 <span class="skill-tag">Microservices</span>
                                 <span class="skill-tag">DevOps / CI/CD</span>
                                 <span class="skill-tag">Java</span>
                                 <span class="skill-tag">JavaScript</span>
-                                <span class="skill-tag">Salesforce</span>
                             </div>
                         </div>
                     </div>
+                    <aside class="leadership-card reveal" style="--delay:0.1s">
+                        <h3>Leadership snapshot</h3>
+                        <ul class="leadership-list">
+                            <li><strong>Org builder</strong><span>Grew teams from 25 to 120+ engineers; tribe lead for Commerce Experience.</span></li>
+                            <li><strong>P&amp;L impact</strong><span>$15M+ incremental revenue, $5M+ annual cost savings from AI transformation.</span></li>
+                            <li><strong>Scale record</strong><span>Systems serving 80M+ monthly users at 99.9%+ uptime.</span></li>
+                            <li><strong>Open source</strong><span>sober-ai, diy-manus, receipta, lumen — agent tooling on <a href="https://github.com/nitishagar" target="_blank" rel="noopener noreferrer">GitHub</a>.</span></li>
+                            <li><strong>Credentials</strong><span>MBA (City, London) · M.Eng (Waterloo) · AWS Solutions Architect Pro · AWS ML Specialty.</span></li>
+                        </ul>
+                    </aside>
                 </div>
             </div>
         </section>
 
-
-
         <section id="portfolio" class="portfolio">
             <div class="container">
-                <h2 class="section-title reveal">Portfolio</h2>
-                <div class="portfolio-grid">
-                    <div class="portfolio-item reveal" style="--delay:0s">
-                        <div class="portfolio-image">
-                            <div class="project-visual llm-project">
-                                <div class="visual-icon">
-                                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M12 2L2 7L12 12L22 7L12 2Z"></path>
-                                        <path d="M2 17L12 22L22 17"></path>
-                                        <path d="M2 12L12 17L22 12"></path>
-                                    </svg>
-                                </div>
-                                <div class="visual-text">AI/LLM</div>
-                            </div>
+                <p class="section-index reveal">02 — Selected work</p>
+                <h2 class="section-title reveal">Things that shipped and moved a number.</h2>
+                <div class="work-list">
+                    <article class="work-row reveal">
+                        <span class="work-num">01</span>
+                        <div class="work-main">
+                            <h3>CASA — commerce assistant for 20M+ merchants</h3>
+                            <p>LLM-powered sales enablement across POS, mobile, checkout, and catalog at GoDaddy. Backed by a multi-agent QA platform running 24/7 so the assistant earns trust instead of assuming it.</p>
+                            <div class="portfolio-tech"><span class="tech-tag">LLM / GenAI</span><span class="tech-tag">Multi-Agent Systems</span><span class="tech-tag">AWS SageMaker</span></div>
                         </div>
-                        <div class="portfolio-content">
-                            <h3>CASA AI Agent — Commerce Assistant</h3>
-                            <p>Architected LLM-powered commerce assistant for 20M+ merchants, driving sales enablement across POS, mobile, checkout, and catalog management at GoDaddy. Includes multi-agent QA platform for 24/7 continuous testing.</p>
-                            <div class="portfolio-tech">
-                                <span class="tech-tag">LLM / GenAI</span>
-                                <span class="tech-tag">Multi-Agent Systems</span>
-                                <span class="tech-tag">AWS SageMaker</span>
-                            </div>
-                            <div class="portfolio-links">
-                                <a href="#" class="portfolio-link">Learn More</a>
-                            </div>
+                        <span class="work-metric">$15M+ revenue</span>
+                    </article>
+                    <article class="work-row reveal" style="--delay:0.08s">
+                        <span class="work-num">02</span>
+                        <div class="work-main">
+                            <h3>IoT application marketplace — 9 weeks to under 1 week</h3>
+                            <p>Led Balena's marketplace strategy: enterprise fleets deploy 8x faster, enterprise acquisition up 40%. Shipped SSO, MFA, and passkeys behind a $5M+ sales pipeline.</p>
+                            <div class="portfolio-tech"><span class="tech-tag">Node.js</span><span class="tech-tag">Docker</span><span class="tech-tag">Kubernetes</span></div>
                         </div>
-                    </div>
-                    <div class="portfolio-item reveal" style="--delay:0.15s">
-                        <div class="portfolio-image">
-                            <div class="project-visual iot-project">
-                                <div class="visual-icon">
-                                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                        <path d="M12 1V9M12 15V23M4.22 4.22L9.88 9.88M14.12 14.12L19.78 19.78M1 12H9M15 12H23M4.22 19.78L9.88 14.12M14.12 9.88L19.78 4.22"></path>
-                                    </svg>
-                                </div>
-                                <div class="visual-text">IoT</div>
-                            </div>
+                        <span class="work-metric">8x faster deploys</span>
+                    </article>
+                    <article class="work-row reveal" style="--delay:0.16s">
+                        <span class="work-num">03</span>
+                        <div class="work-main">
+                            <h3>Flight search — 3,000ms to 200ms for 80M users</h3>
+                            <p>Rebuilt Skyscanner's search path for a 93% latency cut: conversion +15%, satisfaction +25%. Led the Trip.com white-label integration behind a $20M+ EU opportunity.</p>
+                            <div class="portfolio-tech"><span class="tech-tag">Java</span><span class="tech-tag">Microservices</span><span class="tech-tag">Redis</span></div>
                         </div>
-                        <div class="portfolio-content">
-                            <h3>IoT Application Marketplace</h3>
-                            <p>Led Balena's IoT marketplace strategy, reducing fleet software adoption from 9+ weeks to under 1 week. Enterprise customers deploy 8x faster; drove 40% increase in enterprise acquisition. Integrated SSO, MFA, and passkeys enabling $5M+ sales pipeline.</p>
-                            <div class="portfolio-tech">
-                                <span class="tech-tag">Node.js</span>
-                                <span class="tech-tag">Docker</span>
-                                <span class="tech-tag">Kubernetes</span>
-                            </div>
-                            <div class="portfolio-links">
-                                <a href="#" class="portfolio-link">Learn More</a>
-                            </div>
+                        <span class="work-metric">93% faster</span>
+                    </article>
+                    <article class="work-row reveal" style="--delay:0.24s">
+                        <span class="work-num">04</span>
+                        <div class="work-main">
+                            <h3>sober-ai — open-source Lighthouse for AI agents</h3>
+                            <p>A single reliability score with actionable fixes for agent systems. Part of a broader open-source bench: diy-manus (LangGraph + Mem0), receipta (signed AI receipts), lumen (MCP-first SEO).</p>
+                            <div class="portfolio-tech"><span class="tech-tag">Open Source</span><span class="tech-tag">Agent Evals</span><span class="tech-tag">Python</span></div>
                         </div>
-                    </div>
-                    <div class="portfolio-item reveal" style="--delay:0.3s">
-                        <div class="portfolio-image">
-                            <div class="project-visual flight-project">
-                                <div class="visual-icon">
-                                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                                    </svg>
-                                </div>
-                                <div class="visual-text">Search</div>
-                            </div>
-                        </div>
-                        <div class="portfolio-content">
-                            <h3>High-Performance Flight Search Engine</h3>
-                            <p>Achieved 93% reduction in flight search response time (3000ms → 200ms) for Skyscanner's 80M monthly users, improving conversion by 15% and satisfaction by 25%. Led Trip.com white-label integration enabling $20M+ EU market opportunity.</p>
-                            <div class="portfolio-tech">
-                                <span class="tech-tag">Java</span>
-                                <span class="tech-tag">Microservices</span>
-                                <span class="tech-tag">Redis</span>
-                            </div>
-                            <div class="portfolio-links">
-                                <a href="#" class="portfolio-link">Learn More</a>
-                            </div>
-                        </div>
-                    </div>
+                        <a class="work-metric work-link" href="https://github.com/nitishagar/sober-ai" target="_blank" rel="noopener noreferrer">View on GitHub →</a>
+                    </article>
                 </div>
             </div>
         </section>
 
         <section id="blog" class="blog">
             <div class="container">
-                <h2 class="section-title reveal">Blog</h2>
+                <p class="section-index reveal">03 — Writing</p>
+                <h2 class="section-title reveal">Latest from the agent-reliability series.</h2>
+                <p class="section-lede reveal">Seven posts on what breaks when agents meet production — each one from a real incident, each with a checklist. Newest first.</p>
+                <div class="blog-feature reveal">
+                    <div class="blog-feature-main">
+                        <div class="blog-date"><span class="mono-tag">Agent reliability · No. 7</span> · September 25, 2026</div>
+                        <h3>Ship the Escalation Queue Before You Ship the Agent</h3>
+                        <p>Our audit agent ran three weeks without asking a human a single question — then a spot-check found eleven bad approvals. "Ask if unsure" in a system prompt is a fire exit sign with no stairs behind it. This one covers risk tiers, async escalation, staffing the queue like on-call, and feeding every human answer back into evals.</p>
+                        <a href="https://nitishagar.medium.com" class="blog-link" target="_blank" rel="noopener noreferrer">Read on Medium →</a>
+                    </div>
+                    <ul class="blog-archive">
+                        <li><span class="mono-tag">No. 6</span><a href="https://nitishagar.medium.com" target="_blank" rel="noopener noreferrer">I Pointed Six Agents at Our Repo. The Bottleneck Moved to Me.</a><span class="blog-archive-date">Sep 25, 2026</span></li>
+                        <li><span class="mono-tag">No. 5</span><a href="https://nitishagar.medium.com" target="_blank" rel="noopener noreferrer">Stop Tuning the Prompt. The Eval Is the Feature.</a><span class="blog-archive-date">Sep 25, 2026</span></li>
+                        <li><span class="mono-tag">No. 4</span><a href="https://nitishagar.medium.com" target="_blank" rel="noopener noreferrer">Your Multi-Agent System Is a Distributed System in Denial</a><span class="blog-archive-date">Aug 17, 2026</span></li>
+                        <li><span class="mono-tag">No. 3</span><a href="https://nitishagar.medium.com" target="_blank" rel="noopener noreferrer">Your LLM Judge Is Biased. Calibrate It Like an Instrument.</a><span class="blog-archive-date">Aug 17, 2026</span></li>
+                    </ul>
+                </div>
                 <div class="blog-grid">
-                    <article class="blog-item reveal" style="--delay:0s">
-                        <div class="blog-image">
-                            <div class="blog-visual llm-integration">
-                                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                                    <path d="M9 12l2 2 4-4"></path>
-                                </svg>
-                            </div>
-                        </div>
+                    <article class="blog-item reveal">
                         <div class="blog-content">
                             <div class="blog-date">March 5, 2026</div>
                             <h3>Your AI coding assistant is writing tests that protect bugs</h3>
@@ -201,16 +197,7 @@
                             <a href="https://nitishagar.medium.com/your-ai-coding-assistant-is-writing-tests-that-protect-bugs-b1103d523543" class="blog-link" target="_blank" rel="noopener noreferrer">Read on Medium →</a>
                         </div>
                     </article>
-                    <article class="blog-item reveal" style="--delay:0.15s">
-                        <div class="blog-image">
-                            <div class="blog-visual team-scaling">
-                                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <line x1="2" y1="12" x2="22" y2="12"></line>
-                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                                </svg>
-                            </div>
-                        </div>
+                    <article class="blog-item reveal" style="--delay:0.08s">
                         <div class="blog-content">
                             <div class="blog-date">March 1, 2026</div>
                             <h3>We Built an Open-Source Lighthouse for AI Agents</h3>
@@ -218,16 +205,7 @@
                             <a href="https://nitishagar.medium.com/we-built-an-open-source-lighthouse-for-ai-agents-heres-what-we-learned-8c768e176e5c" class="blog-link" target="_blank" rel="noopener noreferrer">Read on Medium →</a>
                         </div>
                     </article>
-                    <article class="blog-item reveal" style="--delay:0.3s">
-                        <div class="blog-image">
-                            <div class="blog-visual iot-platform">
-                                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <rect x="2" y="3" width="20" height="14" rx="2"></rect>
-                                    <path d="M8 21h8M12 17v4"></path>
-                                    <path d="M7 8h10M7 12h5"></path>
-                                </svg>
-                            </div>
-                        </div>
+                    <article class="blog-item reveal" style="--delay:0.16s">
                         <div class="blog-content">
                             <div class="blog-date">February 17, 2026</div>
                             <h3>Why Your AI Agent Architecture Is Wrong</h3>
@@ -237,104 +215,44 @@
                     </article>
                 </div>
                 <div class="blog-cta">
-                    <p>View all articles on <a href="https://nitishagar.medium.com" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">Medium</a></p>
+                    <p>Everything lives on <a href="https://nitishagar.medium.com" target="_blank" rel="noopener noreferrer">Medium</a> — the drafts above land there first.</p>
                 </div>
             </div>
         </section>
 
         <section id="contact" class="contact">
-            <div class="container">
-                <h2 class="section-title reveal">Let's Connect</h2>
-                <div class="contact-content">
-                    <p class="contact-intro">Ready to collaborate on your next big project? I bring a unique blend of technical expertise and business acumen to deliver exceptional results.</p>
-                    
-                    <div class="credentials-grid reveal">
-                        <div class="credential-card">
-                            <div class="credential-icon">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
-                                    <path d="M6 12v5c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2v-5"></path>
-                                </svg>
-                            </div>
-                            <h3>MBA</h3>
-                            <p>City University of London</p>
-                        </div>
-                        <div class="credential-card">
-                            <div class="credential-icon">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                                    <line x1="8" y1="21" x2="16" y2="21"></line>
-                                    <line x1="12" y1="17" x2="12" y2="21"></line>
-                                </svg>
-                            </div>
-                            <h3>M.Eng</h3>
-                            <p>University of Waterloo</p>
-                        </div>
-                        <div class="credential-card">
-                            <div class="credential-icon">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
-                                </svg>
-                            </div>
-                            <h3>AWS Certified</h3>
-                            <p>Solutions Architect Pro</p>
-                        </div>
-                        <div class="credential-card">
-                            <div class="credential-icon">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 2L2 7L12 12L22 7L12 2Z"></path>
-                                    <path d="M2 17L12 22L22 17"></path>
-                                    <path d="M2 12L12 17L22 12"></path>
-                                </svg>
-                            </div>
-                            <h3>AWS ML</h3>
-                            <p>Machine Learning Specialty</p>
-                        </div>
+            <div class="container contact-grid">
+                <div class="reveal">
+                    <p class="section-index">04 — Contact</p>
+                    <h2 class="section-title">Let's talk about your hardest scaling problem.</h2>
+                    <p class="contact-intro">I answer email like an escalation queue: fast, with receipts. Whether it's agent reliability, platform scale, or growing the team that builds both — I'd like to hear what you're stuck on.</p>
+                    <div class="contact-links">
+                        <a href="mailto:nitish.agarwal@outlook.com" class="contact-btn primary">
+                            <svg class="contact-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            Email Me
+                        </a>
+                        <a href="https://linkedin.com/in/agarwalnitish" class="contact-btn" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                        <a href="https://github.com/nitishagar" class="contact-btn" target="_blank" rel="noopener noreferrer">GitHub</a>
+                        <a href="https://nitishagar.medium.com" class="contact-btn" target="_blank" rel="noopener noreferrer">Medium</a>
                     </div>
-                    
-                    <div class="contact-cta reveal" style="--delay:0.15s">
-                        <h3>Ready to Build Something Amazing?</h3>
-                        <p>Connect with me through any of these channels:</p>
-                        <div class="contact-links">
-                            <a href="mailto:nitish.agarwal@outlook.com" class="contact-btn primary">
-                                <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                    <polyline points="22,6 12,13 2,6"></polyline>
-                                </svg>
-                                Email Me
-                            </a>
-                            <a href="https://linkedin.com/in/agarwalnitish" class="contact-btn" target="_blank" rel="noopener noreferrer">
-                                <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
-                                    <rect x="2" y="9" width="4" height="12"></rect>
-                                    <circle cx="4" cy="4" r="2"></circle>
-                                </svg>
-                                LinkedIn
-                            </a>
-                            <a href="https://github.com/nitishagar" class="contact-btn" target="_blank" rel="noopener noreferrer">
-                                <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-                                </svg>
-                                GitHub
-                            </a>
-                            <a href="https://nitishagar.medium.com" class="contact-btn" target="_blank" rel="noopener noreferrer">
-                                <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M13.5 6.5C13.5 3.46243 11.0376 1 8 1C4.96243 1 2.5 3.46243 2.5 6.5C2.5 9.53757 4.96243 12 8 12C11.0376 12 13.5 9.53757 13.5 6.5Z"></path>
-                                    <path d="M19.5 6.5C19.5 3.46243 18.2688 1 16.75 1C15.2312 1 14 3.46243 14 6.5C14 9.53757 15.2312 12 16.75 12C18.2688 12 19.5 9.53757 19.5 6.5Z"></path>
-                                    <path d="M22.5 6.5C22.5 3.46243 22.1194 1 21.25 1C20.3806 1 20 3.46243 20 6.5C20 9.53757 20.3806 12 21.25 12C22.1194 12 22.5 9.53757 22.5 6.5Z"></path>
-                                </svg>
-                                Medium
-                            </a>
-                        </div>
-                    </div>
+                </div>
+                <div class="credentials-list reveal" style="--delay:0.1s">
+                    <div class="credential-row"><strong>MBA</strong><span>City University of London</span></div>
+                    <div class="credential-row"><strong>M.Eng</strong><span>University of Waterloo</span></div>
+                    <div class="credential-row"><strong>AWS</strong><span>Solutions Architect Professional</span></div>
+                    <div class="credential-row"><strong>AWS</strong><span>Machine Learning Specialty</span></div>
                 </div>
             </div>
         </section>
     </main>
 
     <footer class="footer">
-        <div class="container">
+        <div class="container footer-inner">
             <p>&copy; 2026 Nitish Agarwal. All rights reserved.</p>
+            <p class="footer-note">Static site · No trackers · Eval replay pending</p>
         </div>
     </footer>
 
