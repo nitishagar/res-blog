@@ -58,7 +58,7 @@ window.addEventListener('scroll', () => {
 // Typewriter effect
 const typewriterEl = document.getElementById('typewriter');
 const phrases = [
-    'Engineering leader, GoDaddy Commerce',
+    'Engineering leader, GoDaddy',
     'I write about agent reliability',
     'Evals before prompts. Queues before agents.',
     'Org builder: 25 to 120+ engineers'
