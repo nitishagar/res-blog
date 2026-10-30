@@ -1,0 +1,42 @@
+{
+  "series": "Agent reliability",
+  "featured": {
+    "no": 7,
+    "tag": "Agent reliability · No. 7",
+    "title": "Ship the Escalation Queue Before You Ship the Agent",
+    "dek": "Our audit agent ran three weeks without asking a human a single question — then a spot-check found eleven bad approvals. \"Ask if unsure\" in a system prompt is a fire exit sign with no stairs behind it. This one covers risk tiers, async escalation, staffing the queue like on-call, and feeding every human answer back into evals.",
+    "date": "September 25, 2026",
+    "url": "https://nitishagar.medium.com",
+    "external": true
+  },
+  "archive": [
+    {
+      "no": 6,
+      "title": "I Pointed Six Agents at Our Repo. The Bottleneck Moved to Me.",
+      "date": "Sep 25, 2026",
+      "url": "https://nitishagar.medium.com",
+      "external": true
+    },
+    {
+      "no": 5,
+      "title": "Stop Tuning the Prompt. The Eval Is the Feature.",
+      "date": "Sep 25, 2026",
+      "url": "https://nitishagar.medium.com",
+      "external": true
+    },
+    {
+      "no": 4,
+      "title": "Your Multi-Agent System Is a Distributed System in Denial",
+      "date": "Aug 17, 2026",
+      "url": "https://nitishagar.medium.com",
+      "external": true
+    },
+    {
+      "no": 3,
+      "title": "Your LLM Judge Is Biased. Calibrate It Like an Instrument.",
+      "date": "Aug 17, 2026",
+      "url": "https://nitishagar.medium.com",
+      "external": true
+    }
+  ]
+}

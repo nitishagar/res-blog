@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Nitish Agarwal — Agent Reliability</title>
+    <link>https://res-blog.nitishagar.workers.dev/</link>
+    <description>What breaks when agents meet production — each one from a real incident, each with a checklist.</description>
+    <language>en</language>
+    <item>
+      <title>I Gave My CI a Tamagotchi</title>
+      <link>https://res-blog.nitishagar.workers.dev/posts/i-gave-my-ci-a-tamagotchi</link>
+      <guid>https://res-blog.nitishagar.workers.dev/posts/i-gave-my-ci-a-tamagotchi</guid>
+      <pubDate>Fri, 30 Oct 2026 00:00:00 GMT</pubDate>
+      <description>Meta open-sourced the Muse gadget SDK, and my Arduino UNO Q had an 8x13 LED matrix doing nothing but blink boot codes. Now a pixel creature lives there: it hops when CI goes green, sulks when a deploy fails, dozes when the board runs hot.</description>
+    </item>
+  </channel>
+</rss>

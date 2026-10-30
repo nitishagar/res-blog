@@ -96,7 +96,12 @@ async function testHTMLContent() {
             { pattern: /id="portfolio"/i, name: 'Portfolio section' },
             { pattern: /id="blog"/i, name: 'Blog section' },
             { pattern: /id="contact"/i, name: 'Contact section' },
-            { pattern: /nitishagar\.medium\.com/i, name: 'Medium blog integration' },
+            { pattern: /nitishagar\.medium\.com/i, name: 'Legacy Medium links intact' },
+            { pattern: /BLOG-FEED-START[\s\S]*BLOG-FEED-END/, name: 'Publisher feed markers' },
+            { pattern: /BLOG-CTA-START[\s\S]*BLOG-CTA-END/, name: 'Publisher CTA markers' },
+            { pattern: /rel="canonical"/i, name: 'Canonical link' },
+            { pattern: /href="\/blog"/, name: 'Blog index link' },
+            { pattern: /class="hamburger"/, name: 'Mobile hamburger' },
             { pattern: /nitish\.agarwal@outlook\.com/i, name: 'Email contact' },
             { pattern: /lang="en"/i, name: 'Language attribute' },
             { pattern: /<title>/i, name: 'Page title' }
@@ -249,6 +254,253 @@ async function testPerformance() {
     }
 }
 
+const SITE_URL = 'https://res-blog.nitishagar.workers.dev';
+
+async function testCloudflareConfig() {
+    info('Testing Cloudflare configuration...');
+
+    try {
+        const cfg = JSON.parse(await fs.promises.readFile(path.join(__dirname, 'wrangler.jsonc'), 'utf8'));
+        if (cfg.name === 'res-blog' && cfg.assets && cfg.assets.directory === '.' && !cfg.main) {
+            pass('Cloudflare: wrangler.jsonc', 'Assets-only worker, directory .');
+        } else {
+            fail('Cloudflare: wrangler.jsonc', 'Expected assets-only config with directory .');
+        }
+    } catch (error) {
+        fail('Cloudflare: wrangler.jsonc', `Unreadable: ${error.message}`);
+    }
+
+    try {
+        const headers = await fs.promises.readFile(path.join(__dirname, '_headers'), 'utf8');
+        const checks = [
+            { pattern: /Content-Security-Policy/, name: 'CSP present' },
+            { pattern: /fonts\.googleapis\.com/, name: 'Google Fonts style-src' },
+            { pattern: /fonts\.gstatic\.com/, name: 'Google Fonts font-src' },
+            { pattern: /Strict-Transport-Security/, name: 'HSTS present' },
+            { pattern: /^\/posts\/\*$/m, name: 'Posts header block' }
+        ];
+        checks.forEach(check => {
+            if (check.pattern.test(headers)) {
+                pass(`Cloudflare: _headers ${check.name}`, 'Found');
+            } else {
+                fail(`Cloudflare: _headers ${check.name}`, 'Not found');
+            }
+        });
+    } catch (error) {
+        fail('Cloudflare: _headers', `Error reading file: ${error.message}`);
+    }
+
+    try {
+        const redirects = await fs.promises.readFile(path.join(__dirname, '_redirects'), 'utf8');
+        if (redirects.includes('/index.html') && redirects.includes(' 301')) {
+            pass('Cloudflare: _redirects', 'index.html canonical rule present');
+        } else {
+            fail('Cloudflare: _redirects', 'Missing /index.html rule');
+        }
+    } catch (error) {
+        fail('Cloudflare: _redirects', `Error reading file: ${error.message}`);
+    }
+
+    try {
+        const notFound = await fs.promises.readFile(path.join(__dirname, '404.html'), 'utf8');
+        if (/noindex/i.test(notFound) && notFound.includes('/#blog') && notFound.includes('class="hamburger"')) {
+            pass('Cloudflare: 404.html', 'noindex + writing link + hamburger');
+        } else {
+            fail('Cloudflare: 404.html', 'Missing noindex, writing link, or hamburger');
+        }
+    } catch (error) {
+        fail('Cloudflare: 404.html', `Error reading file: ${error.message}`);
+    }
+
+    try {
+        const ignore = await fs.promises.readFile(path.join(__dirname, '.assetsignore'), 'utf8');
+        if (ignore.includes('.git/') && ignore.includes('server.js') && ignore.includes('scripts/')) {
+            pass('Cloudflare: .assetsignore', 'Dev files and .git excluded');
+        } else {
+            fail('Cloudflare: .assetsignore', 'Missing exclusions (.git/, server.js, scripts/)');
+        }
+    } catch (error) {
+        fail('Cloudflare: .assetsignore', `Error reading file: ${error.message}`);
+    }
+}
+
+async function testBlogSystem() {
+    info('Testing blog system...');
+
+    const TOKENS = ['TITLE', 'DEK', 'DATE', 'DATE_ISO', 'SERIES_TAG', 'CANONICAL_URL',
+        'COVER_URL', 'HERO_FIGURE', 'TAGS_HTML', 'READ_TIME', 'CONTENT_HTML',
+        'PREV_LINK', 'NEXT_LINK', 'EA_PUBLISHER'];
+
+    try {
+        const template = await fs.promises.readFile(path.join(__dirname, 'scripts/post-template.html'), 'utf8');
+        const missing = TOKENS.filter(t => !template.includes(`{{${t}}}`));
+        if (missing.length === 0) {
+            pass('Blog: post template tokens', `${TOKENS.length} tokens present`);
+        } else {
+            fail('Blog: post template tokens', `Missing: ${missing.join(', ')}`);
+        }
+        if (/data-ea-publisher="\{\{EA_PUBLISHER\}\}"/.test(template)) {
+            pass('Blog: ad slot in template', 'Publisher-gated div present');
+        } else {
+            fail('Blog: ad slot in template', 'Missing gated ad-slot div');
+        }
+        if ((template.match(/href="\/blog"/g) || []).length >= 2) {
+            pass('Blog: template index links', 'All-writing + nav point at /blog');
+        } else {
+            fail('Blog: template index links', 'Template should link /blog twice');
+        }
+        if (template.includes('class="hamburger"')) {
+            pass('Blog: template hamburger', 'Mobile menu button present (script.js queries it)');
+        } else {
+            fail('Blog: template hamburger', 'Missing .hamburger crashes script.js reveals');
+        }
+    } catch (error) {
+        fail('Blog: post template', `Error reading file: ${error.message}`);
+    }
+
+    try {
+        const backfill = JSON.parse(await fs.promises.readFile(path.join(__dirname, 'posts/medium-backfill.json'), 'utf8'));
+        if (backfill.featured && backfill.featured.title && Array.isArray(backfill.archive) && backfill.archive.length === 4) {
+            pass('Blog: medium backfill', 'Featured + 4 archive entries');
+        } else {
+            fail('Blog: medium backfill', 'Expected featured + 4 archive entries');
+        }
+    } catch (error) {
+        fail('Blog: medium backfill', `Unreadable: ${error.message}`);
+    }
+
+    let postSlugs = [];
+    try {
+        postSlugs = (await fs.promises.readdir(path.join(__dirname, 'posts')))
+            .filter(f => f.endsWith('.html')).map(f => f.replace(/\.html$/, ''));
+        info(`Found ${postSlugs.length} published post(s).`);
+    } catch (error) {
+        fail('Blog: posts dir', `Unreadable: ${error.message}`);
+    }
+
+    try {
+        const sitemap = await fs.promises.readFile(path.join(__dirname, 'sitemap.xml'), 'utf8');
+        const missing = postSlugs.filter(s => !sitemap.includes(`/posts/${s}`));
+        if (sitemap.includes(SITE_URL) && missing.length === 0) {
+            pass('Blog: sitemap.xml', `Site URL + ${postSlugs.length} post(s) listed`);
+        } else {
+            fail('Blog: sitemap.xml', missing.length ? `Missing slugs: ${missing.join(', ')}` : 'Missing site URL');
+        }
+    } catch (error) {
+        fail('Blog: sitemap.xml', `Error reading file: ${error.message}`);
+    }
+
+    try {
+        const feed = await fs.promises.readFile(path.join(__dirname, 'feed.xml'), 'utf8');
+        const missing = postSlugs.filter(s => !feed.includes(`/posts/${s}`));
+        if (feed.includes('<rss') && feed.includes(SITE_URL) && missing.length === 0) {
+            pass('Blog: feed.xml', `Valid channel + ${postSlugs.length} post(s) listed`);
+        } else {
+            fail('Blog: feed.xml', missing.length ? `Missing slugs: ${missing.join(', ')}` : 'Invalid channel');
+        }
+    } catch (error) {
+        fail('Blog: feed.xml', `Error reading file: ${error.message}`);
+    }
+
+    for (const slug of postSlugs) {
+        try {
+            const html = await fs.promises.readFile(path.join(__dirname, 'posts', `${slug}.html`), 'utf8');
+            const checks = [
+                { pattern: /<title>[^<]+<\/title>/i, name: 'title' },
+                { pattern: /rel="canonical"/i, name: 'canonical' },
+                { pattern: /"@type":\s*"BlogPosting"/, name: 'BlogPosting JSON-LD' },
+                { pattern: /data-ea-publisher=""/, name: 'inert ad slot' }
+            ];
+            const missing = checks.filter(c => !c.pattern.test(html)).map(c => c.name);
+            const titleText = (html.match(/<title>([^<]*) — Nitish Agarwal<\/title>/) || [])[1] || '';
+            const h2dupe = titleText !== '' && html.includes(`<h2>${titleText}</h2>`);
+            const leftover = /\{\{[A-Z_]+\}\}/.test(html);
+            const problems = [...missing.map(m => `missing ${m}`),
+                ...(leftover ? ['leftover template tokens'] : []),
+                ...(h2dupe ? ['body heading duplicates page title'] : [])];
+            if (problems.length === 0) {
+                pass(`Blog: post ${slug}`, 'SEO + inert slot + no dupes/tokens');
+            } else {
+                fail(`Blog: post ${slug}`, problems.join('; '));
+            }
+            if (!/\+91.*982.*120.*0201/i.test(html)) {
+                pass(`Blog: post ${slug} privacy`, 'Phone number excluded');
+            } else {
+                fail(`Blog: post ${slug} privacy`, 'Phone number leaked into post');
+            }
+        } catch (error) {
+            fail(`Blog: post ${slug}`, `Error reading file: ${error.message}`);
+        }
+    }
+
+    try {
+        const index = await fs.promises.readFile(path.join(__dirname, 'index.html'), 'utf8');
+        const links = [...index.matchAll(/href="(\/posts\/[^"]+)"/g)].map(m => m[1]);
+        const missing = links.filter(href => {
+            const file = href.replace(/^\//, '');
+            // Extensionless post URLs resolve to sibling .html files on Cloudflare.
+            return !fs.existsSync(path.join(__dirname, file)) && !fs.existsSync(path.join(__dirname, `${file}.html`));
+        });
+        if (missing.length === 0) {
+            pass('Blog: index post links', `${links.length} link(s), all resolve`);
+        } else {
+            fail('Blog: index post links', `Broken: ${missing.join(', ')}`);
+        }
+    } catch (error) {
+        fail('Blog: index post links', `Error reading file: ${error.message}`);
+    }
+
+    try {
+        const blog = await fs.promises.readFile(path.join(__dirname, 'blog.html'), 'utf8');
+        const checks = [
+            { pattern: /rel="canonical" href="[^"]*\/blog"/, name: 'canonical /blog' },
+            { pattern: /<h2 class="section-title">All posts\.<\/h2>/, name: 'full archive' },
+            { pattern: /class="hamburger"/, name: 'mobile hamburger' }
+        ];
+        const missing = checks.filter(c => !c.pattern.test(blog)).map(c => c.name);
+        const slugsMissing = postSlugs.filter(s => !blog.includes(`/posts/${s}`));
+        const links = [...blog.matchAll(/href="(\/posts\/[^"]+)"/g)].map(m => m[1]);
+        const broken = links.filter(href => {
+            const file = href.replace(/^\//, '');
+            return !fs.existsSync(path.join(__dirname, file)) && !fs.existsSync(path.join(__dirname, `${file}.html`));
+        });
+        const problems = [...missing.map(m => `missing ${m}`),
+            ...slugsMissing.map(s => `slug absent: ${s}`),
+            ...broken.map(b => `broken link: ${b}`)];
+        if (problems.length === 0) {
+            pass('Blog: blog.html index', `Canonical + full archive (${postSlugs.length} post(s), ${links.length} link(s))`);
+        } else {
+            fail('Blog: blog.html index', problems.join('; '));
+        }
+    } catch (error) {
+        fail('Blog: blog.html index', `Error reading file: ${error.message}`);
+    }
+
+    try {
+        const queue = JSON.parse(await fs.promises.readFile(path.join(__dirname, 'posts/queue.json'), 'utf8'));
+        const pubs = queue.posts.filter(p => p.status === 'published')
+            .sort((a, b) => (a.date < b.date ? 1 : -1));
+        if (pubs.length > 0) {
+            const newest = pubs[0];
+            const cover = ['.jpg', '.png']
+                .map(ext => `posts/covers/${newest.slug}${ext}`)
+                .find(f => fs.existsSync(path.join(__dirname, f)));
+            const index = await fs.promises.readFile(path.join(__dirname, 'index.html'), 'utf8');
+            if (cover && index.includes('blog-feature-cover') && index.includes(`/${cover}`)) {
+                pass('Blog: featured cover', `Featured shows ${cover}`);
+            } else if (!cover) {
+                pass('Blog: featured cover', 'No cover art yet, thumb correctly absent');
+            } else {
+                fail('Blog: featured cover', `Cover exists at ${cover} but is not featured`);
+            }
+        } else {
+            pass('Blog: featured cover', 'Nothing published yet');
+        }
+    } catch (error) {
+        fail('Blog: featured cover', `Error reading queue: ${error.message}`);
+    }
+}
+
 // Generate coverage report
 function generateCoverageReport() {
     console.log('\n' + colors.blue + '═══════════════════════════════════════════════════' + colors.reset);
@@ -278,6 +530,7 @@ function generateCoverageReport() {
         console.log(colors.green + '✓ Ready for deployment!' + colors.reset);
         console.log(colors.green + '✓ GitHub Pages compatible' + colors.reset);
         console.log(colors.green + '✓ AWS Amplify compatible' + colors.reset);
+        console.log(colors.green + '✓ Cloudflare Workers compatible' + colors.reset);
     } else {
         console.log(colors.red + '✗ Fix failed tests before deployment' + colors.reset);
     }
@@ -292,7 +545,10 @@ async function runTests() {
     
     // Test 1: Check required files
     info('Checking required files...');
-    const requiredFiles = ['index.html', 'styles.css', 'script.js', 'amplify.yml', 'server.js', 'package.json'];
+    const requiredFiles = ['index.html', 'styles.css', 'script.js', 'amplify.yml', 'server.js', 'package.json',
+        'wrangler.jsonc', '_headers', '_redirects', '404.html', '.assetsignore',
+        'sitemap.xml', 'robots.txt', 'feed.xml', 'blog.html',
+        'scripts/post-template.html', 'posts/medium-backfill.json'];
     for (const file of requiredFiles) {
         await testFileExists(file);
     }
@@ -330,7 +586,17 @@ async function runTests() {
     
     // Test 7: GitHub Pages compatibility
     await testGitHubPagesCompatibility();
-    
+
+    console.log('');
+
+    // Test 8: Cloudflare configuration
+    await testCloudflareConfig();
+
+    console.log('');
+
+    // Test 9: Blog system
+    await testBlogSystem();
+
     // Generate report
     generateCoverageReport();
     
