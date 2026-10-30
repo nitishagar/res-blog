@@ -2,12 +2,14 @@
   "series": "Agent reliability",
   "featured": {
     "no": 7,
+    "slug": "no-7-escalation-queue",
     "tag": "Agent reliability · No. 7",
     "title": "Ship the Escalation Queue Before You Ship the Agent",
     "dek": "Our audit agent ran three weeks without asking a human a single question — then a spot-check found eleven bad approvals. \"Ask if unsure\" in a system prompt is a fire exit sign with no stairs behind it. This one covers risk tiers, async escalation, staffing the queue like on-call, and feeding every human answer back into evals.",
     "date": "September 25, 2026",
     "url": "https://nitishagar.medium.com",
-    "external": true
+    "external": true,
+    "short": "Sep 25, 2026"
   },
   "archive": [
     {
@@ -15,28 +17,32 @@
       "title": "I Pointed Six Agents at Our Repo. The Bottleneck Moved to Me.",
       "date": "Sep 25, 2026",
       "url": "https://nitishagar.medium.com",
-      "external": true
+      "external": true,
+      "slug": "no-6-six-agents"
     },
     {
       "no": 5,
       "title": "Stop Tuning the Prompt. The Eval Is the Feature.",
       "date": "Sep 25, 2026",
       "url": "https://nitishagar.medium.com",
-      "external": true
+      "external": true,
+      "slug": "no-5-eval-is-feature"
     },
     {
       "no": 4,
       "title": "Your Multi-Agent System Is a Distributed System in Denial",
       "date": "Aug 17, 2026",
       "url": "https://nitishagar.medium.com",
-      "external": true
+      "external": true,
+      "slug": "no-4-distributed-denial"
     },
     {
       "no": 3,
       "title": "Your LLM Judge Is Biased. Calibrate It Like an Instrument.",
       "date": "Aug 17, 2026",
       "url": "https://nitishagar.medium.com",
-      "external": true
+      "external": true,
+      "slug": "no-3-llm-judge"
     }
   ]
 }

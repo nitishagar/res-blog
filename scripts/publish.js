@@ -218,13 +218,37 @@ function extLink(url, text, cls) {
     return `<a href="${escHtml(url)}" class="${cls}" target="_blank" rel="noopener noreferrer">${escHtml(text)}</a>`;
 }
 
-function featureCard(p, cover) {
+// Series slides for the cover carousel (self-hosted + Medium, newest first).
+// Standalone "Field notes" stay out of the carousel; they appear in archives.
+function buildSlides(publishedSeries, backfill) {
+    const slides = [
+        ...publishedSeries.map(p => ({ no: p.no, title: p.title, url: p.url, cover: coverFor(p.slug), external: false, t: Date.parse(p.iso) })),
+        { no: backfill.featured.no, title: backfill.featured.title, url: backfill.featured.url, cover: coverFor(backfill.featured.slug), external: true, t: Date.parse(backfill.featured.date) },
+        ...backfill.archive.map(a => ({ no: a.no, title: a.title, url: a.url, cover: coverFor(a.slug), external: true, t: Date.parse(a.date) }))
+    ].filter(s => s.cover).sort((a, b) => b.t - a.t);
+    return slides.map(({ no, title, url, cover, external }) => ({ no, title, url, cover, external }));
+}
+
+function slideCaption(s) {
+    return `<span class="carousel-cap"><span class="mono-tag">No. ${s.no}</span> ${escHtml(s.title)}${s.external ? '<span class="ext">↗</span>' : ''}</span>`;
+}
+
+function featureCard(p, slides) {
     const link = selfLink(p.url, 'Read →', 'blog-link');
-    const thumb = cover
-        ? `<a class="blog-feature-cover" href="${p.url}"><img src="${cover}" alt="" loading="lazy"></a>\n                    `
-        : '';
+    const first = slides[0];
+    const ext = first.external ? ' target="_blank" rel="noopener noreferrer"' : '';
+    const carousel = `<div class="carousel" data-carousel tabindex="0">
+                        <a class="carousel-slide" href="${first.url}"${ext}>
+                            <img src="${first.cover}" alt="" loading="lazy">${slideCaption(first)}
+                        </a>
+                        <button class="carousel-btn prev" type="button" aria-label="Previous post">‹</button>
+                        <button class="carousel-btn next" type="button" aria-label="Next post">›</button>
+                        <span class="carousel-count">1 / ${slides.length}</span>
+                        <script type="application/json" class="carousel-data">${JSON.stringify(slides).replace(/<\//g, '<\\/')}</script>
+                    </div>
+                    `;
     return `                <div class="blog-feature reveal">
-                    ${thumb}<div class="blog-feature-main">
+                    ${carousel}<div class="blog-feature-main">
                         <div class="blog-date"><span class="mono-tag">${escHtml(p.tag)}</span> · ${escHtml(p.date)}</div>
                         <h3>${escHtml(p.title)}</h3>
                         <p>${escHtml(p.dek)}</p>
@@ -238,20 +262,16 @@ function archiveItemSelf(p) {
 }
 
 function archiveItemExt(no, title, date, url) {
-    return `<li><span class="mono-tag">No. ${no}</span>${extLink(url, title, '')}<span class="blog-archive-date">${escHtml(date)}</span></li>`;
+    return `<li><span class="mono-tag">No. ${no}</span>${extLink(url, title, '')}<span class="ext" aria-label="external link">↗</span><span class="blog-archive-date">${escHtml(date)}</span></li>`;
 }
 
-function fillArchive(olderPublished, backfill) {
-    const archive = olderPublished.map(archiveItemSelf);
-    if (olderPublished.length === 0) {
-        const f = backfill.featured;
-        archive.push(archiveItemExt(f.no, f.title, f.date.replace(/^\w+ (\d+), (\d+)$/, '$1'), f.url));
-    }
-    for (const a of backfill.archive) {
-        if (archive.length >= 4 + olderPublished.length) break;
-        archive.push(archiveItemExt(a.no, a.title, a.date, a.url));
-    }
-    return archive;
+function fillArchive(olderPublished, backfill, cap = 7) {
+    const dated = [
+        ...olderPublished.map(p => ({ t: Date.parse(p.iso), html: archiveItemSelf(p) })),
+        { t: Date.parse(backfill.featured.date), html: archiveItemExt(backfill.featured.no, backfill.featured.title, backfill.featured.short, backfill.featured.url) },
+        ...backfill.archive.map(a => ({ t: Date.parse(a.date), html: archiveItemExt(a.no, a.title, a.date, a.url) }))
+    ].sort((x, y) => y.t - x.t);
+    return dated.slice(0, cap).map(d => d.html);
 }
 
 function renderFeed(published, backfill, series) {
@@ -259,7 +279,8 @@ function renderFeed(published, backfill, series) {
     const total = 7 + published.length;
     const lede = `<p class="section-lede reveal">${countWord(total)} posts on what breaks when agents meet production — each one from a real incident, each with a checklist. Newest first.</p>`;
     const archive = fillArchive(published.slice(1), backfill);
-    return lede + '\n' + featureCard(newest, coverFor(newest.slug)) + `
+    const slides = buildSlides(published.filter(p => p.no != null), backfill);
+    return lede + '\n' + featureCard(newest, slides) + `
                     <ul class="blog-archive">
                         ${archive.join('\n                        ')}
                     </ul>
@@ -285,7 +306,7 @@ function renderBlogPage(site, published, backfill, series) {
     const total = 7 + published.length;
     const items = published.map(archiveItemSelf);
     const f = backfill.featured;
-    items.push(archiveItemExt(f.no, f.title, f.date, f.url));
+    items.push(archiveItemExt(f.no, f.title, f.short, f.url));
     for (const a of backfill.archive) items.push(archiveItemExt(a.no, a.title, a.date, a.url));
     return `<!DOCTYPE html>
 <html lang="en">
@@ -331,7 +352,7 @@ function renderBlogPage(site, published, backfill, series) {
                 <p><a href="/" class="blog-link">&larr; Nitish Agarwal</a></p>
                 <p class="section-index">Writing</p>
                 <h2 class="section-title">Latest from the agent-reliability series.</h2>
-${featureCard(newest, coverFor(newest.slug))}
+${featureCard(newest, buildSlides(published.filter(p => p.no != null), backfill))}
                     <ul class="blog-archive">
                         ${fillArchive(published.slice(1), backfill).join('\n                        ')}
                     </ul>

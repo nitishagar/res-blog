@@ -135,3 +135,54 @@ const counterObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.5 });
 
 document.querySelectorAll('.stat-number').forEach(el => counterObserver.observe(el));
+
+// Cover carousel: rotates series covers; the first slide is server-rendered
+// so the carousel degrades to a static cover without JS.
+document.querySelectorAll('[data-carousel]').forEach(root => {
+    const slides = JSON.parse(root.querySelector('.carousel-data').textContent);
+    if (slides.length < 2) return;
+    const link = root.querySelector('.carousel-slide');
+    const img = link.querySelector('img');
+    const cap = link.querySelector('.carousel-cap');
+    const count = root.querySelector('.carousel-count');
+    let idx = 0;
+    let timer = null;
+    const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    function show(n) {
+        idx = (n + slides.length) % slides.length;
+        const s = slides[idx];
+        link.style.opacity = '0';
+        setTimeout(() => {
+            link.href = s.url;
+            if (s.external) {
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+            } else {
+                link.removeAttribute('target');
+                link.removeAttribute('rel');
+            }
+            img.src = s.cover;
+            cap.innerHTML = `<span class="mono-tag">No. ${s.no}</span> ${esc(s.title)}${s.external ? '<span class="ext">↗</span>' : ''}`;
+            count.textContent = `${idx + 1} / ${slides.length}`;
+            link.style.opacity = '1';
+        }, 200);
+    }
+
+    root.querySelector('.carousel-btn.prev').addEventListener('click', () => show(idx - 1));
+    root.querySelector('.carousel-btn.next').addEventListener('click', () => show(idx + 1));
+    root.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') show(idx - 1);
+        else if (e.key === 'ArrowRight') show(idx + 1);
+    });
+
+    if (!prefersReducedMotion) {
+        const start = () => { timer = setInterval(() => show(idx + 1), 6000); };
+        const stop = () => { if (timer) clearInterval(timer); timer = null; };
+        start();
+        root.addEventListener('mouseenter', stop);
+        root.addEventListener('mouseleave', start);
+        root.addEventListener('focusin', stop);
+        root.addEventListener('focusout', start);
+    }
+});

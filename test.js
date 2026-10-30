@@ -499,18 +499,81 @@ async function testBlogSystem() {
             } else {
                 fail('Blog: featured is newest', `Feed leads with ${firstLink}, newest is ${newest.slug}`);
             }
-            if (cover && index.includes('blog-feature-cover') && index.includes(`/${cover}`)) {
-                pass('Blog: featured cover', `Featured shows ${cover}`);
-            } else if (!cover) {
-                pass('Blog: featured cover', 'No cover art yet, thumb correctly absent');
+            const backfill = JSON.parse(await fs.promises.readFile(path.join(__dirname, 'posts/medium-backfill.json'), 'utf8'));
+            const hasCover = slug => ['.jpg', '.png', '.svg']
+                .some(ext => fs.existsSync(path.join(__dirname, `posts/covers/${slug}${ext}`)));
+            const seriesPubs = pubs.filter(p => p.no != null && hasCover(p.slug));
+            const backfillSlides = [backfill.featured, ...backfill.archive].filter(e => e.slug && hasCover(e.slug));
+            const expectedSlides = seriesPubs.length + backfillSlides.length;
+            const carouselJson = (feedRegion.match(/<script type="application\/json" class="carousel-data">([\s\S]*?)<\/script>/) || [])[1];
+            try {
+                const slides = JSON.parse(carouselJson);
+                const missing = slides.filter(s => !fs.existsSync(path.join(__dirname, s.cover)));
+                const newestSeries = pubs.filter(p => p.no != null)
+                    .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))[0];
+                const controls = feedRegion.includes('carousel-btn prev') && feedRegion.includes('carousel-btn next')
+                    && feedRegion.includes(`1 / ${slides.length}`);
+                if (slides.length === expectedSlides && missing.length === 0
+                    && slides[0].url === `/posts/${newestSeries.slug}` && controls) {
+                    pass('Blog: carousel slides', `${slides.length} slides, newest first, all covers on disk`);
+                } else {
+                    fail('Blog: carousel slides', `Got ${slides.length}/${expectedSlides} slides, ${missing.length} missing covers, first=${slides[0] && slides[0].url}, controls=${controls}`);
+                }
+            } catch (error) {
+                fail('Blog: carousel slides', `Carousel JSON unparsable: ${error.message}`);
+            }
+            const archiveItems = (feedRegion.match(/<li><span class="mono-tag">/g) || []).length;
+            if (feedRegion.includes('No. 7') && archiveItems <= 7 && feedRegion.includes('↗')) {
+                pass('Blog: archive merged', `Backfill merged chronologically (${archiveItems} items, No. 7 present)`);
             } else {
-                fail('Blog: featured cover', `Cover exists at ${cover} but is not featured`);
+                fail('Blog: archive merged', `No. 7 present=${feedRegion.includes('No. 7')}, items=${archiveItems}, ext-marker=${feedRegion.includes('↗')}`);
             }
         } else {
-            pass('Blog: featured cover', 'Nothing published yet');
+            pass('Blog: carousel slides', 'Nothing published yet');
         }
     } catch (error) {
-        fail('Blog: featured cover', `Error reading queue: ${error.message}`);
+        fail('Blog: carousel slides', `Error reading queue: ${error.message}`);
+    }
+}
+
+async function testDevServerCleanUrls() {
+    const { spawn } = require('child_process');
+    const TEST_PORT = '8123';
+    const get = urlPath => new Promise((resolve, reject) => {
+        http.get({ host: '127.0.0.1', port: TEST_PORT, path: urlPath }, res => {
+            res.resume();
+            res.on('end', () => resolve({ status: res.statusCode, type: res.headers['content-type'] }));
+        }).on('error', reject);
+    });
+    const server = spawn('node', ['server.js'], {
+        env: { ...process.env, PORT: TEST_PORT },
+        stdio: 'ignore'
+    });
+    try {
+        let ready = false;
+        for (let i = 0; i < 50 && !ready; i++) {
+            try { await get('/'); ready = true; } catch { await new Promise(r => setTimeout(r, 100)); }
+        }
+        if (!ready) {
+            fail('Dev server: clean URLs', 'server.js did not start on the test port');
+            return;
+        }
+        const queue = JSON.parse(fs.readFileSync(path.join(__dirname, 'posts/queue.json'), 'utf8'));
+        const slug = queue.posts.find(p => p.status === 'published').slug;
+        const results = [];
+        for (const urlPath of ['/blog', `/posts/${slug}`]) {
+            results.push([urlPath, await get(urlPath)]);
+        }
+        const bad = results.filter(([, r]) => r.status !== 200 || !String(r.type).includes('text/html'));
+        if (bad.length === 0) {
+            pass('Dev server: clean URLs', '/blog and extensionless post URLs serve HTML like production');
+        } else {
+            fail('Dev server: clean URLs', bad.map(([c, r]) => `${c} -> ${r.status}`).join(', '));
+        }
+    } catch (error) {
+        fail('Dev server: clean URLs', error.message);
+    } finally {
+        server.kill();
     }
 }
 
@@ -609,6 +672,11 @@ async function runTests() {
 
     // Test 9: Blog system
     await testBlogSystem();
+
+    console.log('');
+
+    // Test 10: Dev server clean URLs
+    await testDevServerCleanUrls();
 
     // Generate report
     generateCoverageReport();

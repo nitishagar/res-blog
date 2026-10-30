@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 const DIRECTORY = __dirname;
 
 // MIME types for different file extensions
@@ -29,8 +29,14 @@ const mimeTypes = {
 
 const server = http.createServer((req, res) => {
     // Default to index.html for root path
-    let filePath = path.join(DIRECTORY, req.url === '/' ? 'index.html' : req.url);
-    
+    const urlPath = req.url.split('?')[0];
+    let filePath = path.join(DIRECTORY, urlPath === '/' ? 'index.html' : urlPath);
+
+    // Mirror production clean URLs: /blog and /posts/<slug> serve their .html file
+    if (!path.extname(filePath) && !fs.existsSync(filePath) && fs.existsSync(filePath + '.html')) {
+        filePath += '.html';
+    }
+
     // Get file extension
     const extname = path.extname(filePath).toLowerCase();
     const contentType = mimeTypes[extname] || 'application/octet-stream';
