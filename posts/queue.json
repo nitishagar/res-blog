@@ -1,0 +1,43 @@
+{
+  "series": "Agent reliability",
+  "site": "https://res-blog.nitishagar.workers.dev",
+  "posts": [
+    {
+      "slug": "i-gave-my-ci-a-tamagotchi",
+      "no": 8,
+      "source": "posts/drafts/i-gave-my-ci-a-tamagotchi.md",
+      "status": "published",
+      "date": "2026-10-30",
+      "title": "I Gave My CI a Tamagotchi",
+      "dek": "Meta open-sourced the Muse gadget SDK, and my Arduino UNO Q had an 8x13 LED matrix doing nothing but blink boot codes. Now a pixel creature lives there: it hops when CI goes green, sulks when a deploy fails, dozes when the board runs hot."
+    },
+    {
+      "slug": "time-series-models-demystified",
+      "no": 9,
+      "source": "posts/drafts/time-series-models-demystified.md",
+      "status": "queued",
+      "date": null
+    },
+    {
+      "slug": "your-repo-was-built-for-humans",
+      "no": 10,
+      "source": "posts/drafts/your-repo-was-built-for-humans.md",
+      "status": "queued",
+      "date": null
+    },
+    {
+      "slug": "bm25-is-eating-your-vector-db",
+      "no": 1,
+      "source": "posts/drafts/bm25-is-eating-your-vector-db.md",
+      "status": "backfill",
+      "date": null
+    },
+    {
+      "slug": "verification-not-model",
+      "no": 2,
+      "source": "posts/drafts/verification-not-model.md",
+      "status": "backfill",
+      "date": null
+    }
+  ]
+}
