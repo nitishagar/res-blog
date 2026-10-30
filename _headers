@@ -1,0 +1,51 @@
+# Global headers for all responses
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), fullscreen=(self)
+
+# HTML pages: CSP allows self + inline + Google Fonts (index.html loads
+# Inter/JetBrains Mono from fonts.googleapis.com / fonts.gstatic.com).
+# img-src https: covers hero/cover art; no frame-src (no embeds).
+/*.html
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'self';
+  X-Robots-Tag: index, follow, max-image-preview:large
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Root path (/) matches no /*.html glob — duplicate the trio for the homepage.
+/
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'self';
+  X-Robots-Tag: index, follow, max-image-preview:large
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Extensionless post URLs (/posts/<slug> serve the 200s; /*.html only sees the
+# transient 307s). No Cache-Control here: covers keep their own rule below.
+/posts/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'self';
+  X-Robots-Tag: index, follow, max-image-preview:large
+
+# CSS/JS are NOT ?v= versioned in this repo, so revalidate instead of immutable.
+/styles.css
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/script.js
+  Cache-Control: public, max-age=3600, must-revalidate
+
+# Cover/hero art changes per post; day-long cache is plenty.
+/posts/covers/*
+  Cache-Control: public, max-age=86400, must-revalidate
+
+/feed.xml
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/sitemap.xml
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/robots.txt
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/favicon.svg
+  Cache-Control: public, max-age=86400, must-revalidate

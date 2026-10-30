@@ -1,0 +1,8 @@
+# Files used for local dev / CI only — never upload to Cloudflare.
+server.js
+test.js
+test.html
+scripts/
+.git/
+.gitignore
+posts/drafts/
