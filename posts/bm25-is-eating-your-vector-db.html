@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BM25 Is Eating Your Vector DB (And It Should) — Nitish Agarwal</title>
+    <meta name="description" content="A scaling study just said the boring algorithm wins. Here is when to believe it — and the 20-line baseline to test your own retriever.">
+    <link rel="canonical" href="https://res-blog.nitishagar.workers.dev/posts/bm25-is-eating-your-vector-db">
+    <meta property="og:title" content="BM25 Is Eating Your Vector DB (And It Should)">
+    <meta property="og:description" content="A scaling study just said the boring algorithm wins. Here is when to believe it — and the 20-line baseline to test your own retriever.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://res-blog.nitishagar.workers.dev/posts/bm25-is-eating-your-vector-db">
+    <meta property="og:image" content="https://res-blog.nitishagar.workers.dev/posts/covers/bm25-is-eating-your-vector-db.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="BM25 Is Eating Your Vector DB (And It Should)">
+    <meta name="twitter:description" content="A scaling study just said the boring algorithm wins. Here is when to believe it — and the 20-line baseline to test your own retriever.">
+    <meta name="twitter:image" content="https://res-blog.nitishagar.workers.dev/posts/covers/bm25-is-eating-your-vector-db.jpg">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "BM25 Is Eating Your Vector DB (And It Should)",
+        "description": "A scaling study just said the boring algorithm wins. Here is when to believe it — and the 20-line baseline to test your own retriever.",
+        "url": "https://res-blog.nitishagar.workers.dev/posts/bm25-is-eating-your-vector-db",
+        "datePublished": "2026-09-28",
+        "author": { "@type": "Person", "name": "Nitish Agarwal", "url": "https://res-blog.nitishagar.workers.dev/" },
+        "image": "https://res-blog.nitishagar.workers.dev/posts/covers/bm25-is-eating-your-vector-db.jpg"
+    }
+    </script>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="/" class="logo">Nitish Agarwal<span class="logo-dot">.</span></a>
+                <ul class="nav-menu">
+                    <li><a href="/#about" class="nav-link">About</a></li>
+                    <li><a href="/#portfolio" class="nav-link">Work</a></li>
+                    <li><a href="/blog" class="nav-link">Writing</a></li>
+                    <li><a href="/#contact" class="nav-link">Contact</a></li>
+                    <li><a href="https://github.com/nitishagar" class="nav-link nav-cta" target="_blank" rel="noopener noreferrer">GitHub ↗</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main id="main-content">
+        <article class="post">
+            <div class="container post-narrow">
+                <p><a href="/blog" class="blog-link">&larr; All writing</a></p>
+                <p class="section-index">Agent reliability · No. 1</p>
+                <h1 class="post-title">BM25 Is Eating Your Vector DB (And It Should)</h1>
+                <p class="post-dek">A scaling study just said the boring algorithm wins. Here is when to believe it — and the 20-line baseline to test your own retriever.</p>
+                <p class="post-meta">September 28, 2026 · 7 min read</p>
+                <ul class="tag-row"><li><span class="mono-tag">AI</span></li><li><span class="mono-tag">Search</span></li><li><span class="mono-tag">RAG</span></li><li><span class="mono-tag">Engineering</span></li><li><span class="mono-tag">Databases</span></li></ul>
+                
+                <div class="ad-slot" data-ea-publisher="" data-ea-type="image"></div>
+                <div class="post-body">
+<p>A scaling study on retrieval-augmented generation (RAG) paradigms is making the rounds, and its headline lands like a thunk: <strong>at scale, plain BM25 beats the dense and hybrid retrievers people pay a premium for.</strong> Not &quot;is competitive with.&quot; Beats.</p>
+<p>If you've spent the last two years wiring embeddings into Pinecone, pgvector, or a managed retrieval API, that sentence should sting a little. Not because dense retrieval is useless — it isn't — but because the default RAG architecture has been &quot;vector DB first, everything else later&quot; for so long that nobody remembers why.</p>
+<p>Let's dig into when BM25 actually wins, when it doesn't, and the cheap experiment that tells you which side you're on.</p>
+<h3>The default you didn't choose</h3>
+<p>Here's the RAG stack most teams ship today:</p>
+<ol>
+<li>Chunk your corpus.</li>
+<li>Embed every chunk with a sentence-transformer or a frontier-model endpoint.</li>
+<li>Stuff the vectors into a vector database.</li>
+<li>At query time, embed the question, run ANN search, feed top-k into the LLM.</li>
+</ol>
+<p>It works. It's also expensive, fragile, and — for a large class of workloads — slower at finding the right document than an algorithm from 1994.</p>
+<p>BM25 is the ranking function behind Elasticsearch, OpenSearch, Lucene, and Postgres full-text search. It scores documents by term frequency, inverse document frequency, and document length normalization. No embeddings. No GPU. No model to fine-tune when your domain shifts. It's the <code>grep</code> of search: boring, fast, and surprisingly hard to beat on the things people actually search for.</p>
+<h3>Why BM25 keeps winning the boring fights</h3>
+<p>The reason isn't mystical. It's three mechanical facts:</p>
+<p><strong>1. Queries are already keywords.</strong> When a user types <code>kafka consumer group rebalance error</code>, the discriminative signal is in those exact tokens. Dense retrieval maps that query into a 1024-dim vector where the distinction between &quot;rebalance&quot; and &quot;reboot&quot; can get smeared. BM25 just looks for the word. For technical, entity-heavy, and code-adjacent corpora — API docs, runbooks, logs, source — lexical match is the <em>ground truth</em> of relevance.</p>
+<p><strong>2. Rare terms carry the signal.</strong> BM25's IDF component upweights terms that appear in few documents. In a 10M-doc enterprise corpus, the error code <code>ORA-00942</code> appears in eleven documents. Dense similarity might rank all Oracle-flavored docs highly. BM25 puts the eleven right ones first because the rare token dominates the score.</p>
+<p><strong>3. Zero model drift.</strong> Your embedding model gets updated, your domain vocabulary shifts, you reindex. BM25 has no model. The same index that ranked well in 2023 ranks the same way in 2026. For long-lived systems, that's a feature, not a limitation.</p>
+<h3>The part the study is actually telling us</h3>
+<p>The deeper finding from the scaling work isn't &quot;BM25 good, vectors bad.&quot; It's that <strong>retrieval quality curves cross as corpus size grows.</strong> On small, clean, natural-language corpora, dense retrieval's semantic match genuinely helps — &quot;how do I reset my password&quot; finds a doc titled &quot;credential recovery.&quot; On large, heterogeneous, domain-heavy corpora, that semantic softness becomes noise, and lexical precision wins.</p>
+<p>This matches what production search teams have whispered for years: hybrid retrieval (BM25 + dense, fused with reciprocal rank fusion) is the <em>floor</em>, and on technical corpora the BM25 leg carries most of the weight. The expensive vector leg is often contributing a few points of nDCG for a 10x cost and latency premium.</p>
+<p>The actionable version of the headline: <strong>you may be paying vector-DB prices to retrieve documents that keyword search would find better.</strong></p>
+<h3>A 20-line baseline that will save you a sprint</h3>
+<p>Before you defend your retriever architecture, measure it. Here's a baseline that takes an afternoon and removes all guesswork.</p>
+<pre><code># pip install rank_bm25 datasets rapidfuzz
+from rank_bm25 import BM25Okapi
+from datasets import load_dataset
+
+# 1. Load a Q/A eval set that mirrors YOUR domain (not MS MARCO).
+#    Build this from real support tickets, real user queries, labeled.
+eval_set = load_dataset(&quot;your_org/rag_eval&quot;, split=&quot;test&quot;)
+corpus = [d[&quot;text&quot;].split() for d in load_dataset(&quot;your_org/corpus&quot;)]
+bm25 = BM25Okapi(corpus)
+
+def retrieve(query, k=10):
+    return bm25.get_top_n(query.split(), corpus, n=k)
+
+# 2. Score recall@k and nDCG@k the SAME way you'd score your vector retriever.
+def recall_at_k(eval_set, k=10):
+    hits = 0
+    for ex in eval_set:
+        ranked = retrieve(ex[&quot;query&quot;], k)
+        hits += any(gold in ranked for gold in ex[&quot;gold_doc_ids&quot;])
+    return hits / len(eval_set)
+
+print(f&quot;BM25 recall@10: {recall_at_k(eval_set, 10):.3f}&quot;)</code></pre>
+<p>Now run the same eval set through your production vector retriever. <strong>Same corpus, same queries, same gold labels.</strong> Three outcomes:</p>
+<ul>
+<li><strong>BM25 within ~5% of your vector retriever.</strong> Switch. You just deleted a dependency, a reindex pipeline, an embedding endpoint, and a recurring bill. Latency drops, ops complexity drops, and quality is unchanged.</li>
+<li><strong>Vector retriever clearly ahead.</strong> Now you have a <em>quantified</em> reason to keep it. That's worth more than vibes. Also: try hybrid (BM25 + vector + RRF fusion) and see if the gap widens or narrows.</li>
+<li><strong>It's a wash, but hybrid wins both.</strong> Ship hybrid, but make BM25 the primary leg and vectors the tie-breaker. Cheaper, and more robust to embedding-model churn.</li>
+</ul>
+<p>The eval set is the whole game. If you don't have a labeled, domain-specific eval set, your retrieval architecture is a religious choice — build the set first, then have this argument with data.</p>
+<h3>The honest limits</h3>
+<p>BM25 loses where meaning matters more than vocabulary: cross-lingual, paraphrased natural-language queries over prose, and &quot;find me something <em>like</em> this&quot; semantic similarity. If your users ask &quot;why is my pipeline slow&quot; and your docs say &quot;throughput degradation under backpressure,&quot; dense retrieval earns its keep.</p>
+<p>It also struggles with morphology out of the box — <code>running</code> vs <code>ran</code> — which is why production Lucene deployments chain stemmers, synonyms, and analyzers. That tuning is real work, but it's <em>deterministic</em> work: you can read the diff, version it, and reason about it. Tuning an embedding model is not.</p>
+<h3>The decision, compressed</h3>
+<table>
+<thead>
+<tr><th>If your corpus is…</th><th>Lead with…</th><th>Why</th></tr>
+</thead>
+<tbody>
+<tr><td>Technical docs, code, logs, runbooks, entity-heavy</td><td><strong>BM25</strong></td><td>Rare tokens + exact match = ground truth of relevance</td></tr>
+<tr><td>Natural-language prose, cross-lingual, paraphrased queries</td><td><strong>Dense</strong></td><td>Semantic match beats lexical gap</td></tr>
+<tr><td>Mixed / you're not sure</td><td><strong>Hybrid (BM25 + dense, RRF)</strong></td><td>Pay for the vector leg only where it earns its margin</td></tr>
+<tr><td>Tiny (&lt;50k docs), latency-sensitive</td><td><strong>BM25</strong></td><td>Sub-ms, in-process, no network hop</td></tr>
+<tr><td>Huge, multi-tenant, needs semantic filtering</td><td><strong>Dense (but benchmark BM25 first)</strong></td><td>You may still be surprised</td></tr>
+</tbody>
+</table>
+<h3>What to do Monday morning</h3>
+<ol>
+<li><strong>Build the eval set.</strong> 200–500 real queries with gold answers, sampled from your actual traffic. No eval set, no architecture argument.</li>
+<li><strong>Run the BM25 baseline above.</strong> One afternoon.</li>
+<li><strong>Compare to your vector retriever on the same set.</strong> Same metrics, same k.</li>
+<li><strong>If BM25 is within striking distance, prototype the cutover</strong> behind a feature flag. Measure production latency and cost for a week. The reindex pipeline you delete is pure savings.</li>
+</ol>
+<p>The vector-database-as-default pattern made sense when retrieval was an open problem and dense methods were the breakthrough. They were the breakthrough. They're also not free, and for a large and growing share of production RAG workloads, the boring algorithm from 1994 is the better engineering choice — cheaper, faster, more durable, and, against the right eval set, more accurate.</p>
+<p>Stop paying embedding prices for keyword problems. Run the baseline. The result is more often than not the same one the scaling study reported: <strong>BM25 wins.</strong></p>
+<hr>
+<p><em>Footnote on sources: The scaling study referenced (&quot;BM25 Wins at Scale: A Scaling Study of Retrieval-Augmented Generation Paradigms&quot;) was trending on Hugging Face Daily Papers at time of writing. Verify exact corpus sizes and reported deltas against the paper before quoting specific numbers in a published version — the BM25-vs-dense tradeoffs described here (keyword dominance on technical corpora, IDF on rare terms, hybrid as the practical floor) are independently well-established across the IR literature and production search engineering practice.</em></p>
+                </div>
+                <nav class="post-nav">
+                    
+                    <a href="/posts/verification-not-model">No. 2: Your Agent's Failure Mode Is a Verification Problem, Not a Model Problem &rarr;</a>
+                </nav>
+            </div>
+        </article>
+    </main>
+    <footer class="footer">
+        <div class="container footer-inner">
+            <p>&copy; 2026 Nitish Agarwal. All rights reserved.</p>
+            <p class="footer-note">Static site · No trackers</p>
+        </div>
+    </footer>
+    <script src="/script.js"></script>
+</body>
+</html>

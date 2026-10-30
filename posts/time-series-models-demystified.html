@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stop Training Forecast Models. Time Series Just Went Zero-Shot. — Nitish Agarwal</title>
+    <meta name="description" content="Mistral's Timestral can forecast a series it has never seen, on a CPU, in 140 milliseconds. That changes the build-vs-buy maths for every capacity, demand, and sensor dashboard you own.">
+    <link rel="canonical" href="https://res-blog.nitishagar.workers.dev/posts/time-series-models-demystified">
+    <meta property="og:title" content="Stop Training Forecast Models. Time Series Just Went Zero-Shot.">
+    <meta property="og:description" content="Mistral's Timestral can forecast a series it has never seen, on a CPU, in 140 milliseconds. That changes the build-vs-buy maths for every capacity, demand, and sensor dashboard you own.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://res-blog.nitishagar.workers.dev/posts/time-series-models-demystified">
+    <meta property="og:image" content="https://res-blog.nitishagar.workers.dev/posts/covers/time-series-models-demystified.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Stop Training Forecast Models. Time Series Just Went Zero-Shot.">
+    <meta name="twitter:description" content="Mistral's Timestral can forecast a series it has never seen, on a CPU, in 140 milliseconds. That changes the build-vs-buy maths for every capacity, demand, and sensor dashboard you own.">
+    <meta name="twitter:image" content="https://res-blog.nitishagar.workers.dev/posts/covers/time-series-models-demystified.jpg">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Stop Training Forecast Models. Time Series Just Went Zero-Shot.",
+        "description": "Mistral's Timestral can forecast a series it has never seen, on a CPU, in 140 milliseconds. That changes the build-vs-buy maths for every capacity, demand, and sensor dashboard you own.",
+        "url": "https://res-blog.nitishagar.workers.dev/posts/time-series-models-demystified",
+        "datePublished": "2026-10-19",
+        "author": { "@type": "Person", "name": "Nitish Agarwal", "url": "https://res-blog.nitishagar.workers.dev/" },
+        "image": "https://res-blog.nitishagar.workers.dev/posts/covers/time-series-models-demystified.jpg"
+    }
+    </script>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="/" class="logo">Nitish Agarwal<span class="logo-dot">.</span></a>
+                <ul class="nav-menu">
+                    <li><a href="/#about" class="nav-link">About</a></li>
+                    <li><a href="/#portfolio" class="nav-link">Work</a></li>
+                    <li><a href="/blog" class="nav-link">Writing</a></li>
+                    <li><a href="/#contact" class="nav-link">Contact</a></li>
+                    <li><a href="https://github.com/nitishagar" class="nav-link nav-cta" target="_blank" rel="noopener noreferrer">GitHub ↗</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main id="main-content">
+        <article class="post">
+            <div class="container post-narrow">
+                <p><a href="/blog" class="blog-link">&larr; All writing</a></p>
+                <p class="section-index">Agent reliability · No. 9</p>
+                <h1 class="post-title">Stop Training Forecast Models. Time Series Just Went Zero-Shot.</h1>
+                <p class="post-dek">Mistral's Timestral can forecast a series it has never seen, on a CPU, in 140 milliseconds. That changes the build-vs-buy maths for every capacity, demand, and sensor dashboard you own.</p>
+                <p class="post-meta">October 19, 2026 · 12 min read</p>
+                <ul class="tag-row"><li><span class="mono-tag">Machine Learning</span></li><li><span class="mono-tag">Time Series</span></li><li><span class="mono-tag">Forecasting</span></li><li><span class="mono-tag">Artificial Intelligence</span></li><li><span class="mono-tag">Software Engineering</span></li></ul>
+                <figure class="post-hero"><img src="/posts/covers/time-series-pipeline.svg" alt="Forecasting pipeline diagram from time-series model to human decision" loading="lazy"><figcaption>The production shape — small model for numbers, large model for context, deterministic code for gates</figcaption></figure>
+                <div class="ad-slot" data-ea-publisher="" data-ea-type="image"></div>
+                <div class="post-body">
+<h3>Why now: the pretraining trick just ate your second-biggest dataset</h3>
+<p>Text got this treatment first. Pretrain one large model on everything, then point it at a task it was never trained for.</p>
+<p>Time series is next, and it matters because time series is arguably the most common data type in the enterprise: traffic, revenue, inventory, energy load, sensor telemetry, observability metrics. Almost every operational decision — provision, order, staff, maintain, hedge — is secretly a forecast.</p>
+<p>On October 15, Mistral released <strong>Timestral</strong>, its first family of time-series foundation models. Not the first in the field — Amazon's Chronos, Google's TimesFM, and Salesforce's Moirai got there earlier — but the release that makes the trend impossible to file under &quot;research curiosity.&quot; Four open-weight models from <strong>5M to 209M parameters</strong>. The 209M ranks <strong>first among pre-trained zero-shot models on GIFT-Eval, TIME, and fev-bench</strong>, per Mistral's own reporting (leaderboard submissions in, technical report pending — hold the headline at arm's length until it lands). Context up to <strong>32,768 time steps</strong>. Output as <strong>21 quantiles</strong>, a full distribution, not a single number. And it runs on a CPU: a one-day-ahead forecast from three weeks of 15-minute history takes <strong>10 ms with the 5M model, 140 ms with the 209M</strong>, on 8 threads.</p>
+<p>Three forces converged to make this moment, and a principal engineer should be able to name all three in an architecture review:</p>
+<p><strong>1. The training bottleneck removed itself.</strong> The old cost was never the maths; it was a pipeline per problem. Timestral trained synthetic-first, then post-trained on real data; others pretrained on vast real corpora. Either way, <em>somebody else</em> paid the training bill. You start from a competent forecast and spend your time on evaluation, where the production value always lived.</p>
+<p><strong>2. The many-series economy flipped.</strong> One model per series is fine for ten series and a maintenance estate at 40,000 SKUs or 2,000 sensors. One pretrained model serving all of them — including yesterday's — deletes a category of MLOps. Cold start becomes the default path, not the special case.</p>
+<p><strong>3. Small got good enough to ship anywhere.</strong> At ~837 MB (fp32), the largest Timestral serves on hardware you already rent, on-prem or air-gapped. No GPU quota, no new platform. &quot;Should we forecast this?&quot; stops being a budget question and becomes a product question.</p>
+<p>One line to take from this piece: <strong>the forecast became a commodity input. The engineering moved to what you decide with it.</strong></p>
+<h3>What this generation of models is actually good for</h3>
+<p>Strip the launch language away and a time-series foundation model (TSFM) is good at five concrete jobs. If your problem is on this list, evaluate one this quarter.</p>
+<p><strong>Many related series, one model.</strong> Demand across a catalogue, traffic across services, load across regions, telemetry across a fleet. The model borrows strength across series the way a global model always promised to, without you building the global training set.</p>
+<p><strong>Cold start, on purpose.</strong> New product, new sensor, new market: three weeks of history and a planning meeting tomorrow. Per-series models starve here. A zero-shot model arrives with priors from millions of other series and produces a defensible day-one number — with an uncertainty band honest about how little it knows.</p>
+<p><strong>Decisions that need a range, not a point.</strong> Provisioning at P90, staffing at the median, alerting on a P99 breach: operations runs on quantiles. This generation outputs them natively (Timestral trains directly on pinball loss over its 21 quantiles, an approximation of CRPS), so the training objective finally matches the operational question.</p>
+<p><strong>Known-future drivers, used safely.</strong> Holidays, price changes, planned shutdowns, your own launch calendar, a weather forecast. Timestral takes past-only and known-future covariates — categorical ones like machine state included, as categories rather than fake numbers — with leakage control in the architecture: future covariates are visible across the window while the target stays strictly causal. The calendar can inform the forecast; the model cannot peek at its own future.</p>
+<p><strong>Anomaly detection with a calmer pager.</strong> Forecast the band, alert when reality leaves it. &quot;Actual breached the 99% band for this sensor, given the production schedule&quot; carries context a static threshold never will — and it generalises across the fleet without hand-tuning 2,000 thresholds.</p>
+<p>And the boundary, stated once, in writing, before an executive meeting discovers it the hard way: <strong>a forecast is not a counterfactual.</strong> These models extrapolate the world as it was. &quot;What happens if we cut price 20%?&quot; is a causal question, and no model in this article — Timestral, Chronos, or Claude — answers it from history alone.</p>
+<h3>Where Claude is the better fit (and where it must not touch the numbers)</h3>
+<p>Here is the question I hear in every platform review now: <em>&quot;Can't we just ask Claude to forecast it?&quot;</em> Short answer: that's two different jobs wearing one name, and splitting them correctly is the principal-engineer move.</p>
+<p><strong>Do not use Claude — or any LLM — as your numeric forecaster.</strong> Token-by-token extrapolation of raw series is expensive, weakly calibrated, and context-starved next to a purpose-built model that reads 32,768 steps natively and was graded on exactly this. You would be paying frontier-LLM prices for a worse distribution. This is the BM25 lesson in new clothes: use the specialised tool for the specialised substrate.</p>
+<p><strong>Do use Claude for everything around the numbers, because that's where it's the better fit:</strong></p>
+<ul>
+<li><strong>Triage and root cause.</strong> The TSFM says a metric left its band. Claude reads the deploy log, runbook, and similar past tickets, then tells a human <em>why this one matters</em>. Mistral's industrial example is exactly this shape: TSFM flags a pump, agents retrieve past failures, a human gets a diagnosis instead of an alarm.</li>
+<li><strong>Judgment forecasts with no series at all.</strong> Will this launch slip? Which qualitative risk dominates next quarter? No numeric history exists — there are documents, calendars, opinions. That's reading and reasoning. Claude's home turf.</li>
+<li><strong>Turning a distribution into a decision.</strong> P90 crosses your capacity ceiling in six days: Claude drafts options, prices trade-offs, opens the ticket, routes irreversible calls up your escalation tiers — while deterministic code, not a vibe, decides what executes.</li>
+<li><strong>Explanation.</strong> &quot;Demand up 18%, promotion-driven, uncertainty widening past day 10&quot; is a sentence a planning meeting can act on. The TSFM produces quantiles; Claude produces the sentence.</li>
+</ul>
+<p>Picture the production shape that falls out of this split. It will look familiar if you read this series:</p>
+<blockquote><p><strong>Timestral (or Chronos/TimesFM) runs continuously</strong> over your series, emitting quantile forecasts → <strong>a deterministic watcher</strong> compares reality to the band and fires on breach → <strong>Claude investigates</strong> with logs, docs, and history as tools, and files a context bundle → <strong>humans decide</strong> on the tiers that deserve humans, and every decision becomes backtest evidence.</p></blockquote>
+<p>Small specialised model for the numbers, large general model for the context, deterministic code for the gates, humans for the irreversible calls. That division of labour — not model choice — is the actual trend of 2026.</p>
+<h3>How a principal engineer evaluates this (the short list)</h3>
+<p>You don't need to read the architecture diagram. You need six questions that survive contact with a vendor demo.</p>
+<p><strong>1. Does the backtest respect the arrow of time?</strong> Train on the past, test on the future, roll the origin forward. Any shuffled split on time-ordered data is a flattering lie, and leakage — a covariate that won't exist at decision time — remains the number-one cause of &quot;great offline, dead in production.&quot; This discipline is unchanged by foundation models; it's just now your main job instead of your side job.</p>
+<p><strong>2. Which quantile drives which decision — and who chose it?</strong> If nobody can answer, you don't have a forecasting problem yet. You have a decision problem wearing a forecasting costume. Get the mapping in writing before judging any model: median for planning, P90 for provisioning, P99 breach for the page.</p>
+<p><strong>3. What's the scoreboard?</strong> Grade on MASE (are you at least beating &quot;same as last week&quot;?), pinball/CRPS for the distribution, and <em>coverage</em> — when the model says 80% interval, reality should land inside 80% of the time. RMSE alone rewards predicting the average and punishes honest uncertainty.</p>
+<p><strong>4. Are the covariates kept like contracts?</strong> Every known-future input is a promise your pipeline must keep at inference time, forever. Version them like APIs, monitor their availability like dependencies, and know what the forecast does the day one silently nulls.</p>
+<p><strong>5. What happens when the regime ends?</strong> Pricing change, competitor launch, sensor drift — no pretraining corpus contains your future. Budget for backtests that keep running after launch, coverage as an SLO, and fine-tuning for high stakes (Mistral's Forge, air-gapped if needed). Adoption is an afternoon; adaptation is the operating cost.</p>
+<p><strong>6. What does the unit-economics row say?</strong> Cost per <em>decision-grade forecast</em>: zero-shot CPU inference vs. your per-series pipeline (training, registry, retraining on-call) vs. LLM tokens pretending to forecast. In many-series estates, this row ends the debate alone.</p>
+<h3>Where to use which (steal this table)</h3>
+<table>
+<thead>
+<tr><th>Your situation</th><th>Reach for</th><th>Why</th></tr>
+</thead>
+<tbody>
+<tr><td>A handful of stable series; auditors ask questions</td><td>Classical (ETS/ARIMA)</td><td>Interpretable, honest, cheap — still the baseline to beat</td></tr>
+<tr><td>Rich drivers; team already owns feature pipelines</td><td>Gradient-boosted trees on lag/calendar features</td><td>The reigning production workhorse; often the number to beat</td></tr>
+<tr><td>Thousands of related series; cold starts weekly; thin ML platform</td><td><strong>Zero-shot TSFM</strong> (Timestral, Chronos, TimesFM, Moirai)</td><td>Day-one forecasts, one small model to operate, CPU-servable</td></tr>
+<tr><td>One domain, deep data, forecast quality <em>is</em> the product</td><td>TSFM fine-tune, or a bespoke deep model</td><td>Adaptation beats zero-shot once data and stakes are both large</td></tr>
+<tr><td>&quot;Will this launch slip?&quot; / risks living in docs</td><td><strong>Claude</strong></td><td>Judgment over text and calendars, not numeric extrapolation</td></tr>
+<tr><td>Anomaly → why → what do we do</td><td><strong>TSFM band + Claude investigation</strong></td><td>Numbers trip the wire; language works the case</td></tr>
+<tr><td>&quot;What if we change the price?&quot;</td><td>Neither alone</td><td>Causal question. A forecast is not a counterfactual.</td></tr>
+</tbody>
+</table>
+<h3>The one-afternoon start</h3>
+<p>The adoption plan fits in an afternoon because the training step is gone. Protect that simplicity; don't rebuild a platform around a model that doesn't need one.</p>
+<pre><code>import numpy as np
+from timestral import TimestralForecaster   # pip install git+https://github.com/mistralai/timestral.git
+
+forecaster = TimestralForecaster.from_pretrained(&quot;mistralai/Timestral-209M&quot;)  # CPU is fine
+
+context = ...                                # (series, variates, time); NaN = missing
+forecast = forecaster.forecast(
+    context,
+    prediction_length=96,
+    known_covariates=known,                  # e.g. holiday / launch calendar, over context + horizon
+)
+forecast.quantiles.shape                     # (series, variates, 96, 21) — a distribution per step</code></pre>
+<ol>
+<li><strong>Backtest before you believe (90 minutes).</strong> Twenty representative series, eight rolling cut-points, graded on MASE and coverage against seasonal-naive and whatever you run today. If zero-shot doesn't beat seasonal-naive on your data, stop and ask why before spending another hour.</li>
+<li><strong>Wire one decision to one quantile (30 minutes).</strong> Pick the consumer with the clearest trigger — capacity, reorder point, alert — and write its quantile down where an on-call can find it at 2 a.m.</li>
+<li><strong>Ship the monitor with the model (60 minutes).</strong> Log every forecast with its covariates. Score last week's forecasts against reality weekly. The week coverage slips is the week the regime moved — and you'll learn it from a chart while it's still cheap.</li>
+</ol>
+<h3>Takeaway</h3>
+<p>For sixty years, forecasting skill meant modelling skill: one series, one equation, artisanal everything. Pretraining ended that era the same way it ended per-task NLP. What a principal engineer owns now is the system around the commodity forecast: honest backtests, quantiles wired to decisions, covariates kept like contracts, drift watched like an SLO — and a clear-eyed split between the small model that produces the numbers and the large one, like Claude, that produces understanding about them.</p>
+<p>The teams that win this transition won't be the ones with the best forecaster. They'll be the ones who noticed the forecast stopped being the product.</p>
+<p><strong>Run the zero-shot baseline first. Spend the saved weeks on the decisions.</strong></p>
+<hr>
+<h4>Sources</h4>
+<ul>
+<li>Mistral AI, <a href="https://mistral.ai/news/timestral/" target="_blank" rel="noopener noreferrer">*Introducing Timestral*</a> (Oct 15, 2026): 5M–209M family, zero-shot #1 on GIFT-Eval / TIME / fev-bench (Mistral-reported, tech report pending), 32,768-step context, 21 quantiles, CPU latency 10 ms (5M) / 140 ms (209M) on 8 threads, multivariate + past-only/known-future/categorical covariates, covariate-aware attention, synthetic-first two-stage training, Forge fine-tuning incl. air-gapped; &quot;From Model to System&quot; plant example (TSFM flags → agent root-cause → human plan)</li>
+<li>Mistral AI, <a href="https://github.com/mistralai/timestral" target="_blank" rel="noopener noreferrer">github.com/mistralai/timestral</a> + <a href="https://huggingface.co/collections/mistralai/timestral" target="_blank" rel="noopener noreferrer">Hugging Face collection</a>: inference API used above, modified-MIT weights</li>
+<li>MarkTechPost, <a href="https://www.marktechpost.com/2026/10/18/mistral-timestral-time-series-foundation-model/" target="_blank" rel="noopener noreferrer">*Mistral AI Releases Timestral… Outperforms Google's TimesFM-3*</a> (Oct 18, 2026): 209M ≈ 837 MB fp32, GPU optional</li>
+<li>Ansari et al., <em>Chronos</em> (Amazon, 2024) · Das et al., <em>TimesFM</em> (Google, ICML 2024) · Woo et al., <em>Moirai</em> (Salesforce, ICML 2024): the zero-shot TSFM generation Timestral joins</li>
+<li>GIFT-Eval / TIME / fev-bench: re-check leaderboard placement on publication day</li>
+</ul>
+<p><strong>Earlier in this series:</strong></p>
+<ul>
+<li><em>BM25 Is Eating Your Vector DB (And It Should)</em>: same reflex — specialised tool first, platform second</li>
+<li><em>The Eval Is the Feature</em>: a rolling backtest is an eval harness with the arrow of time enforced</li>
+<li><em>Ship the Escalation Queue Before You Ship the Agent</em>: where Claude's investigation bundle should land</li>
+<li><em>The Routing Number No One Measures</em>: cost per successful decision, applied to model choice above</li>
+</ul>
+<p><em>Alt titles if you A/B test: &quot;Forecasting Just Had Its Foundation-Model Moment&quot; · &quot;Your Next Forecaster Is 209M Parameters and Runs on a CPU&quot;</em></p>
+                </div>
+                <nav class="post-nav">
+                    <a href="/posts/i-gave-my-ci-a-tamagotchi">&larr; No. 8: I Gave My CI a Tamagotchi</a>
+                    <a href="/posts/your-repo-was-built-for-humans">No. 10: Your Repo Was Built for Humans. Your Agents Are the Users Now. &rarr;</a>
+                </nav>
+            </div>
+        </article>
+    </main>
+    <footer class="footer">
+        <div class="container footer-inner">
+            <p>&copy; 2026 Nitish Agarwal. All rights reserved.</p>
+            <p class="footer-note">Static site · No trackers</p>
+        </div>
+    </footer>
+    <script src="/script.js"></script>
+</body>
+</html>

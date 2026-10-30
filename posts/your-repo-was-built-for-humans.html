@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Repo Was Built for Humans. Your Agents Are the Users Now. — Nitish Agarwal</title>
+    <meta name="description" content="Anthropic just replaced Git because its agents merge 30,000 changes a day. You should not replace Git. But the pressure that forced their hand is already in your repo — here is where it shows up first.">
+    <link rel="canonical" href="https://res-blog.nitishagar.workers.dev/posts/your-repo-was-built-for-humans">
+    <meta property="og:title" content="Your Repo Was Built for Humans. Your Agents Are the Users Now.">
+    <meta property="og:description" content="Anthropic just replaced Git because its agents merge 30,000 changes a day. You should not replace Git. But the pressure that forced their hand is already in your repo — here is where it shows up first.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://res-blog.nitishagar.workers.dev/posts/your-repo-was-built-for-humans">
+    <meta property="og:image" content="https://res-blog.nitishagar.workers.dev/posts/covers/your-repo-was-built-for-humans.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Your Repo Was Built for Humans. Your Agents Are the Users Now.">
+    <meta name="twitter:description" content="Anthropic just replaced Git because its agents merge 30,000 changes a day. You should not replace Git. But the pressure that forced their hand is already in your repo — here is where it shows up first.">
+    <meta name="twitter:image" content="https://res-blog.nitishagar.workers.dev/posts/covers/your-repo-was-built-for-humans.jpg">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Your Repo Was Built for Humans. Your Agents Are the Users Now.",
+        "description": "Anthropic just replaced Git because its agents merge 30,000 changes a day. You should not replace Git. But the pressure that forced their hand is already in your repo — here is where it shows up first.",
+        "url": "https://res-blog.nitishagar.workers.dev/posts/your-repo-was-built-for-humans",
+        "datePublished": "2026-10-26",
+        "author": { "@type": "Person", "name": "Nitish Agarwal", "url": "https://res-blog.nitishagar.workers.dev/" },
+        "image": "https://res-blog.nitishagar.workers.dev/posts/covers/your-repo-was-built-for-humans.jpg"
+    }
+    </script>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="/" class="logo">Nitish Agarwal<span class="logo-dot">.</span></a>
+                <ul class="nav-menu">
+                    <li><a href="/#about" class="nav-link">About</a></li>
+                    <li><a href="/#portfolio" class="nav-link">Work</a></li>
+                    <li><a href="/blog" class="nav-link">Writing</a></li>
+                    <li><a href="/#contact" class="nav-link">Contact</a></li>
+                    <li><a href="https://github.com/nitishagar" class="nav-link nav-cta" target="_blank" rel="noopener noreferrer">GitHub ↗</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main id="main-content">
+        <article class="post">
+            <div class="container post-narrow">
+                <p><a href="/blog" class="blog-link">&larr; All writing</a></p>
+                <p class="section-index">Agent reliability · No. 10</p>
+                <h1 class="post-title">Your Repo Was Built for Humans. Your Agents Are the Users Now.</h1>
+                <p class="post-dek">Anthropic just replaced Git because its agents merge 30,000 changes a day. You should not replace Git. But the pressure that forced their hand is already in your repo — here is where it shows up first.</p>
+                <p class="post-meta">October 26, 2026 · 10 min read</p>
+                <ul class="tag-row"><li><span class="mono-tag">Software Engineering</span></li><li><span class="mono-tag">Git</span></li><li><span class="mono-tag">DevOps</span></li><li><span class="mono-tag">AI</span></li><li><span class="mono-tag">Programming</span></li></ul>
+                
+                <div class="ad-slot" data-ea-publisher="" data-ea-type="image"></div>
+                <div class="post-body">
+<h3>First, an honest sentence: do not build a version control system</h3>
+<p>On October 13, Anthropic published the most interesting infrastructure post of the year. In May 2026 they merged about <strong>2,500 code changes a day</strong>. By September: <strong>over 30,000 a day</strong> — a twelvefold jump in four months, driven, in their words, by Claude writing code, reviewing code, and iterating on research loops on its own. Source control became, quote, &quot;our biggest development bottleneck.&quot;</p>
+<p>So a team of seven built <strong>Scion</strong>, a new version control system, plus a code-review tool called Antique, code search, and a source-control IAM system — and migrated the whole monorepo off Git in five months.</p>
+<p>The internet filed this under &quot;Git is dead.&quot; It isn't — Anthropic says so themselves: <em>&quot;Scion is by no means a suitable replacement for git for general use.&quot;</em> Their workload is an outlier's outlier: main-branch history <strong>almost 100 GB</strong>, a compressed working copy over <strong>25 GB</strong>, on the order of <strong>25 million checkouts a day</strong> for CI alone (naively fetched, <strong>over 600 petabytes a day</strong>), <em>several hundred</em> internal Git mirrors at peak. Perhaps seven companies on Earth have this problem at this size. You are not one of them. Neither am I. So why write about Scion at all?</p>
+<p>Because I read the post the way you read a weather report from a town upwind of yours. The storm that hits them at 30,000 merges a day arrives at your repo as a drizzle: agent PRs queuing behind a merge queue designed for humans, CI bills climbing for reasons nobody can itemise, checkouts that take minutes in jobs that run for seconds. <strong>The bottleneck moved from writing code to absorbing code.</strong> Last month I wrote about the human half of that sentence — six agents, one reviewer, a queue that collapsed by hour three. This is the machine half. Same storm, other window.</p>
+<p>One line to take from this piece: <strong>keep Git, and start operating it as if agents are its primary client — because in your repo, increasingly, they are.</strong></p>
+<h3>What actually broke (it's not the part you'd guess)</h3>
+<p>Git's founding bargain is beautiful: every clone is a complete repository. Offline diffs, offline blame, offline history. For twenty years that bargain was obviously right, because the client was a human with a laptop and a plane to catch.</p>
+<p>An agent is not that client. An agent — and its even more numerous cousins, CI jobs and sandboxes — is always online, lives for minutes, wants a thin slice of the repo <em>right now</em>, and will ask the same metadata questions (&quot;who touched this file?&quot;, &quot;what's the merge base?&quot;) millions of times a day. Forcing that client to negotiate packfiles and maintain a local repository to answer those questions is like making every API caller download the database.</p>
+<p>Scion's design is what you get when you take the new client seriously:</p>
+<ul>
+<li><strong>Server-centric, content-addressed everything.</strong> Changesets, trees, and blobs never change once stored, so any tier can cache them without asking anyone. Servers become, in Anthropic's phrase, essentially large caches that can also compute.</li>
+<li><strong>Derived data computed once, server-side.</strong> Blame, path history, commit-graph indices — computed generically from changesets, eagerly or lazily, instead of re-derived by every clone forever.</li>
+<li><strong>Checkouts as cache reads.</strong> The client asks only for the trees and blobs it actually wants, recursively — no multi-gigabyte packfile, resumable by construction, sparse for free because &quot;sparse&quot; just means &quot;didn't ask.&quot; A per-node daemon shares objects across every job on the machine; regional caches stream from memory. Every tier reports a <strong>cache hit rate over 99%</strong>.</li>
+</ul>
+<p>The results are the part to underline. Scion's infrastructure footprint is <strong>200× smaller</strong> in CPU and memory than the Git-mirroring fleet it replaced. Checkouts went from minutes to <strong>seconds — two orders of magnitude</strong> — and CI alone got a <strong>25% CPU capacity win</strong> back. Read that again slowly. A quarter of their CI fleet was, in effect, being spent <em>fetching code</em>.</p>
+<p>Two caveats. Anthropic could do this partly because their internal token budget &quot;far exceeds what any other business would realistically want to spend&quot; — a seven-person, five-month VCS migration is agent leverage, not a photocopiable plan. And even they haven't solved everything: a proper merge queue &quot;doesn't make much sense at agent scale,&quot; so weight shifted to post-merge and pre-deploy testing. That's why the small-scale lessons matter now, while your numbers are still forgiving.</p>
+<h3>The five pressure points, in the order you'll meet them</h3>
+<p>You don't need Scion. You need to know which wall you're walking toward. In every repo where agents open PRs daily, the walls arrive in roughly this order.</p>
+<p><strong>1. Checkout cost becomes a line item.</strong> Humans clone once and amortise it for months. Agents and CI jobs are born, clone, work, and die — hundreds of times a day. If your checkout takes three minutes and your job runs for four, you don't have a CI cost problem, you have a <em>fetch</em> problem wearing a CI costume. The Git-native fixes are unglamorous and mostly already in your toolbox: shallow and blobless clones (<code>--filter=blob:none</code>), sparse checkouts scoped to the service under test, warm local mirrors or seed snapshots next to your runners, and worktree reuse for agent sandboxes instead of a fresh clone per thread. Measure &quot;seconds spent fetching&quot; as its own dashboard panel. Anthropic's 25% CI win is what lives behind that panel at scale.</p>
+<p><strong>2. Merge throughput stops being free.</strong> A merge queue is a lock, and queueing theory is merciless: as merges-per-hour approaches what your checks can clear per hour, wait time walks off a cliff (Little's Law: queue = arrival rate × time in system; every rebase-and-rerun feeds the queue its own tail). Boring fixes: smaller PRs (a 2,000-line agent PR is a batch-size bug), trunk-based flow, affected-only test selection, merge-queue batching where supported. I sized the <em>reviewer</em> to the farm in Post-6. Size the <em>merge path</em> the same way — it's deploy capacity.</p>
+<p><strong>3. CI capacity becomes a budget conversation.</strong> The routing-number lesson in a new costume: the honest unit is <strong>cost per merged, surviving change</strong> — fetch, post-rebase reruns, flaky retries, abandoned PRs included. Track monthly: checkouts/day, CI minutes per merged change, merge-queue wait (p50/p90). When all three climb together, spend on mirrors, caches, and test selection then — not when the queue hits four hours and someone suggests disabling required checks.</p>
+<p><strong>4. Review needs semantics, not just eyes.</strong> Antique, Anthropic's review tool, can &quot;express complex semantic constraints on approvals&quot; — a comment-only change and a sensitive logic change don't get the same gate. Approximate it today with path-based ownership, diff-size caps, and risk tiers (the T0–T3 table from my escalation-queue piece, pointed at merges). The strain is measurable: a 2026 working paper (700+ firms) found ~30% more code per developer, shipped output flat, review time per PR up ~49%. Generation scaled; absorption didn't. Tiering by consequence is how absorption catches up without a wall of rubber stamps.</p>
+<p><strong>5. Agents need identities, not borrowed human ones.</strong> Scion shipped per-directory permissions and rich IAM from day one because &quot;who — or what — may write here?&quot; is a security boundary. Starter version: distinct bot identity per agent system (never a shared human token), agent branches treated as untrusted input, CODEOWNERS paths agents can't self-approve, and an audit trail answering &quot;which run produced this change?&quot; If you can't answer that today, it's your first fix — it pays out the first time a confident agent refactor needs a 2 a.m. revert.</p>
+<h3>What I actually changed in my own repos (the small-numbers version)</h3>
+<p>My most ambitious repo fits inside a rounding error of Anthropic's <code>main</code>. Reading Scion as a checklist, not a headline, still gave me a weekend's worth of plain-Git changes: agent runs now start from a warm shared mirror (<code>git worktree add</code> off a bare, cron-freshened clone — <em>fetch once per machine, not once per job</em>); agent PRs carry a diff-size budget the coordinator enforces by splitting; CI runs affected-only checks pre-merge with the full suite on trunk; and the dashboard tracks checkouts/day, CI minutes per <em>merged</em> change, and PR-open-to-merge time. No platform team required. Same lesson as always: the model got leverage first, and everything around it has to be re-plumbed for the new arrival rate.</p>
+<h3>The checklist (tape it next to the merge queue)</h3>
+<p>Before your agents' third month in the repo:</p>
+<ol>
+<li><strong>Fetch is a metric.</strong> Seconds-per-checkout and checkouts/day on a dashboard. Shallow/blobless clones, sparse checkouts, warm mirrors beside the runners.</li>
+<li><strong>Batch size is a policy.</strong> Diff-size caps for agent PRs, enforced before human review. Split, don't queue.</li>
+<li><strong>Checks scale with the change.</strong> Affected-only tests pre-merge; full suite on trunk; flakes quarantined, never retried into submission.</li>
+<li><strong>Cost per merged change.</strong> Not per PR, not per run. Include fetch, reruns, and abandonments. Review it monthly like any unit cost.</li>
+<li><strong>Review tiered by consequence.</strong> Path-based ownership and approval shapes. Comment-only ≠ payment path. Humans read where consequence lives.</li>
+<li><strong>Agents have names.</strong> Per-system bot identities, no borrowed human tokens, no self-approval on owned paths, and a run ID in every PR body so &quot;which agent did this?&quot; is a query, not an investigation.</li>
+</ol>
+<h3>Takeaway</h3>
+<p>Anthropic's post will be remembered as the week a lab replaced Git. Read it a second time and it's a different, quieter document: a field report from the first team to discover that developer infrastructure has a <em>client assumption</em> baked into every layer — and that the client changed. They end it generously, by the way: Scion isn't coming to you, so they're sharing the thinking &quot;so that other developers can apply some of the most successful parts of Scion to git without departing from the overall model,&quot; and partnering with the GitHub, GitLab, and OSS communities to scale what exists. Bet on Git adapting. Plan for your repo to need the adaptation.</p>
+<p>The storm metaphor holds to the end. You don't rebuild your house because a town upwind lost its roof. You check your own roof while the weather is still mild. Your agents became your repo's most frequent users some time this year — probably on a Tuesday, probably without a meeting about it.</p>
+<p><strong>Now go look at your checkout times. I'll wait. It won't take as long as your CI does.</strong></p>
+<hr>
+<h4>Sources</h4>
+<ul>
+<li>Anthropic, <a href="https://www.anthropic.com/engineering/redesigning-source-control" target="_blank" rel="noopener noreferrer">*Redesigning source control at Anthropic*</a> (Oct 13, 2026; updated Oct 15): 2,500 → 30,000+ merges/day (May→Sep 2026), ~100 GB main history, ~25M checkouts/day, &gt;600 PB/day naive fetch, several hundred Git mirrors, Scion's content-addressed tiered-cache design (&gt;99% hit per tier), 200× smaller footprint, checkouts in seconds, CI +25% CPU, 7-person team / 5-month migration, Antique semantic approvals, and the explicit &quot;not a suitable replacement for git for general use&quot;</li>
+<li>Secondary coverage, same week: <a href="https://hackernoon.com/ai-agents-are-killing-the-git-client-not-git-what-anthropics-scion-and-cursors-origin-show" target="_blank" rel="noopener noreferrer">Hacker Noon timeline</a> (Scion alongside Cursor's Origin) · <a href="https://www.everydev.ai/p/news-weekly-ai-dev-news-digest-october-10-october-16-2026" target="_blank" rel="noopener noreferrer">EveryDev weekly digest</a> (Oct 16, 2026) — re-check ecosystem responses on publication day; details are days old</li>
+<li>718-firm working paper on AI coding agents (v1 Jan 2026; Aug 2026 revision): ~30% more code per developer, shipped output flat, review time +49%, revisions nearly doubled — via <a href="https://aiweekly.co/alerts/harvard-study-ai-coding-agents-lift-code-30-shipped-output-flat" target="_blank" rel="noopener noreferrer">AIWeekly</a> (Oct 2026); treat as working-paper evidence, not settled fact</li>
+<li>Git itself: <a href="https://git-scm.com/docs/partial-clone" target="_blank" rel="noopener noreferrer">partial clone</a>, <a href="https://git-scm.com/docs/git-sparse-checkout" target="_blank" rel="noopener noreferrer">sparse checkout</a>, <a href="https://git-scm.com/docs/git-worktree" target="_blank" rel="noopener noreferrer">worktrees</a> — the in-Git mitigations listed above</li>
+</ul>
+<p><strong>Earlier in this series:</strong></p>
+<ul>
+<li><em>I Pointed Six Agents at Our Repo. The Bottleneck Moved to Me.</em>: the human half of this story — verification bandwidth and review capacity</li>
+<li><em>Ship the Escalation Queue Before You Ship the Agent</em>: the T0–T3 consequence tiers, applied here to merges</li>
+<li><em>The Routing Number No One Measures</em>: cost-per-success — here, cost per merged, surviving change</li>
+<li><em>Your Multi-Agent System Is a Distributed System in Denial</em>: why a merge queue is a lock, and locks have queueing theory</li>
+</ul>
+                </div>
+                <nav class="post-nav">
+                    <a href="/posts/time-series-models-demystified">&larr; No. 9: Stop Training Forecast Models. Time Series Just Went Zero-Shot.</a>
+                    
+                </nav>
+            </div>
+        </article>
+    </main>
+    <footer class="footer">
+        <div class="container footer-inner">
+            <p>&copy; 2026 Nitish Agarwal. All rights reserved.</p>
+            <p class="footer-note">Static site · No trackers</p>
+        </div>
+    </footer>
+    <script src="/script.js"></script>
+</body>
+</html>

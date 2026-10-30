@@ -233,7 +233,8 @@ function featureCard(p, cover) {
 }
 
 function archiveItemSelf(p) {
-    return `<li><span class="mono-tag">No. ${p.no}</span>${selfLink(p.url, p.title, '')}<span class="blog-archive-date">${escHtml(p.short)}</span></li>`;
+    const tag = p.no != null ? `No. ${p.no}` : (p.tag || 'Field notes');
+    return `<li><span class="mono-tag">${escHtml(tag)}</span>${selfLink(p.url, p.title, '')}<span class="blog-archive-date">${escHtml(p.short)}</span></li>`;
 }
 
 function archiveItemExt(no, title, date, url) {
@@ -385,7 +386,7 @@ function renderPost(queue, entry, iso) {
     const canonical = `${queue.site}${url}`;
 
     const published = queue.posts
-        .filter(p => p.status === 'published')
+        .filter(p => p.status === 'published' && p.no != null)
         .sort((a, b) => a.no - b.no);
     const selfIdx = published.findIndex(p => p.slug === entry.slug);
     const older = selfIdx > 0 ? published[selfIdx - 1] : null;
@@ -407,7 +408,7 @@ function renderPost(queue, entry, iso) {
     const subs = {
         TITLE: escHtml(fm.title), DEK: escHtml(fm.dek),
         DATE: fmtDate(iso), DATE_ISO: iso,
-        SERIES_TAG: `${escHtml(queue.series)} · No. ${entry.no}`,
+        SERIES_TAG: entry.no != null ? `${escHtml(queue.series)} · No. ${entry.no}` : escHtml(entry.tag || 'Field notes'),
         CANONICAL_URL: canonical, COVER_URL: `${queue.site}/${fm.cover}`,
         HERO_FIGURE: hero, TAGS_HTML: tagsHtml, READ_TIME: readTimeMd(body),
         CONTENT_HTML: html, PREV_LINK: prevLink, NEXT_LINK: nextLink,
@@ -426,7 +427,7 @@ function finalize(queue, backfill) {
     const all = queue.posts
         .filter(p => p.status === 'published')
         .map(p => ({ ...p, url: `/posts/${p.slug}`, tag: `${queue.series} · No. ${p.no}`, date: fmtDate(p.date), short: fmtShort(p.date), iso: p.date }))
-        .sort((a, b) => (a.date < b.date ? 1 : -1));
+        .sort((a, b) => (a.iso < b.iso ? 1 : a.iso > b.iso ? -1 : 0));
     let index = read(INDEX_PATH);
     index = replaceRegion(index, '<!-- BLOG-FEED-START: managed by scripts/publish.js — do not hand-edit inside -->',
         '<!-- BLOG-FEED-END -->', renderFeed(all, backfill, queue.series));

@@ -6,11 +6,39 @@
     <description>What breaks when agents meet production — each one from a real incident, each with a checklist.</description>
     <language>en</language>
     <item>
+      <title>Your Repo Was Built for Humans. Your Agents Are the Users Now.</title>
+      <link>https://res-blog.nitishagar.workers.dev/posts/your-repo-was-built-for-humans</link>
+      <guid>https://res-blog.nitishagar.workers.dev/posts/your-repo-was-built-for-humans</guid>
+      <pubDate>Mon, 26 Oct 2026 00:00:00 GMT</pubDate>
+      <description>Anthropic just replaced Git because its agents merge 30,000 changes a day. You should not replace Git. But the pressure that forced their hand is already in your repo — here is where it shows up first.</description>
+    </item>
+    <item>
+      <title>Stop Training Forecast Models. Time Series Just Went Zero-Shot.</title>
+      <link>https://res-blog.nitishagar.workers.dev/posts/time-series-models-demystified</link>
+      <guid>https://res-blog.nitishagar.workers.dev/posts/time-series-models-demystified</guid>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 GMT</pubDate>
+      <description>Mistral's Timestral can forecast a series it has never seen, on a CPU, in 140 milliseconds. That changes the build-vs-buy maths for every capacity, demand, and sensor dashboard you own.</description>
+    </item>
+    <item>
       <title>I Gave My CI a Tamagotchi</title>
       <link>https://res-blog.nitishagar.workers.dev/posts/i-gave-my-ci-a-tamagotchi</link>
       <guid>https://res-blog.nitishagar.workers.dev/posts/i-gave-my-ci-a-tamagotchi</guid>
-      <pubDate>Fri, 30 Oct 2026 00:00:00 GMT</pubDate>
+      <pubDate>Mon, 12 Oct 2026 00:00:00 GMT</pubDate>
       <description>Meta open-sourced the Muse gadget SDK, and my Arduino UNO Q had an 8x13 LED matrix doing nothing but blink boot codes. Now a pixel creature lives there: it hops when CI goes green, sulks when a deploy fails, dozes when the board runs hot.</description>
+    </item>
+    <item>
+      <title>Your Agent's Failure Mode Is a Verification Problem, Not a Model Problem</title>
+      <link>https://res-blog.nitishagar.workers.dev/posts/verification-not-model</link>
+      <guid>https://res-blog.nitishagar.workers.dev/posts/verification-not-model</guid>
+      <pubDate>Mon, 05 Oct 2026 00:00:00 GMT</pubDate>
+      <description>Teams keep swapping models to fix flaky agents. The real bottleneck is that LLM outputs are probabilistic — and test suites assume they are not.</description>
+    </item>
+    <item>
+      <title>BM25 Is Eating Your Vector DB (And It Should)</title>
+      <link>https://res-blog.nitishagar.workers.dev/posts/bm25-is-eating-your-vector-db</link>
+      <guid>https://res-blog.nitishagar.workers.dev/posts/bm25-is-eating-your-vector-db</guid>
+      <pubDate>Mon, 28 Sep 2026 00:00:00 GMT</pubDate>
+      <description>A scaling study just said the boring algorithm wins. Here is when to believe it — and the 20-line baseline to test your own retriever.</description>
     </item>
   </channel>
 </rss>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Agent's Failure Mode Is a Verification Problem, Not a Model Problem — Nitish Agarwal</title>
+    <meta name="description" content="Teams keep swapping models to fix flaky agents. The real bottleneck is that LLM outputs are probabilistic — and test suites assume they are not.">
+    <link rel="canonical" href="https://res-blog.nitishagar.workers.dev/posts/verification-not-model">
+    <meta property="og:title" content="Your Agent's Failure Mode Is a Verification Problem, Not a Model Problem">
+    <meta property="og:description" content="Teams keep swapping models to fix flaky agents. The real bottleneck is that LLM outputs are probabilistic — and test suites assume they are not.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://res-blog.nitishagar.workers.dev/posts/verification-not-model">
+    <meta property="og:image" content="https://res-blog.nitishagar.workers.dev/posts/covers/verification-not-model.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Your Agent's Failure Mode Is a Verification Problem, Not a Model Problem">
+    <meta name="twitter:description" content="Teams keep swapping models to fix flaky agents. The real bottleneck is that LLM outputs are probabilistic — and test suites assume they are not.">
+    <meta name="twitter:image" content="https://res-blog.nitishagar.workers.dev/posts/covers/verification-not-model.jpg">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Your Agent's Failure Mode Is a Verification Problem, Not a Model Problem",
+        "description": "Teams keep swapping models to fix flaky agents. The real bottleneck is that LLM outputs are probabilistic — and test suites assume they are not.",
+        "url": "https://res-blog.nitishagar.workers.dev/posts/verification-not-model",
+        "datePublished": "2026-10-05",
+        "author": { "@type": "Person", "name": "Nitish Agarwal", "url": "https://res-blog.nitishagar.workers.dev/" },
+        "image": "https://res-blog.nitishagar.workers.dev/posts/covers/verification-not-model.jpg"
+    }
+    </script>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="/" class="logo">Nitish Agarwal<span class="logo-dot">.</span></a>
+                <ul class="nav-menu">
+                    <li><a href="/#about" class="nav-link">About</a></li>
+                    <li><a href="/#portfolio" class="nav-link">Work</a></li>
+                    <li><a href="/blog" class="nav-link">Writing</a></li>
+                    <li><a href="/#contact" class="nav-link">Contact</a></li>
+                    <li><a href="https://github.com/nitishagar" class="nav-link nav-cta" target="_blank" rel="noopener noreferrer">GitHub ↗</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main id="main-content">
+        <article class="post">
+            <div class="container post-narrow">
+                <p><a href="/blog" class="blog-link">&larr; All writing</a></p>
+                <p class="section-index">Agent reliability · No. 2</p>
+                <h1 class="post-title">Your Agent's Failure Mode Is a Verification Problem, Not a Model Problem</h1>
+                <p class="post-dek">Teams keep swapping models to fix flaky agents. The real bottleneck is that LLM outputs are probabilistic — and test suites assume they are not.</p>
+                <p class="post-meta">October 5, 2026 · 7 min read</p>
+                <ul class="tag-row"><li><span class="mono-tag">AI Agents</span></li><li><span class="mono-tag">Testing</span></li><li><span class="mono-tag">Evals</span></li><li><span class="mono-tag">Reliability</span></li><li><span class="mono-tag">Engineering</span></li></ul>
+                
+                <div class="ad-slot" data-ea-publisher="" data-ea-type="image"></div>
+                <div class="post-body">
+<p>A team ships an agent. It works in the demo. It works in staging. In production it returns the wrong answer 3% of the time, and nobody can agree on why. The conversation follows a familiar arc:</p>
+<ul>
+<li>&quot;Bump it to the bigger model.&quot; (Costs 5x. Error rate drops to 2%.)</li>
+<li>&quot;Add more few-shot examples.&quot; (Error rate drops to 1.5%, then plateaus.)</li>
+<li>&quot;Tune the prompt.&quot; (Error rate oscillates between 1% and 4% depending on who last edited it.)</li>
+<li>&quot;Maybe we need a different framework.&quot; (Replatform. Error rate unchanged.)</li>
+</ul>
+<p>Here's what's actually happening: <strong>you're treating a probabilistic system like a deterministic one, and your verification layer is too thin to tell you where the error is.</strong> Every model swap is a guess because you have no instrumentation that separates <em>retrieval failure</em> from <em>reasoning failure</em> from <em>tool-call formatting failure</em> from <em>genuine model-capability ceiling</em>.</p>
+<p>Until you fix verification, model selection is roulette. Let's build the layer that makes the diagnosis tractable.</p>
+<h3>Why agents break differently</h3>
+<p>Conventional software fails in ways your test suite was designed for: a function returns the wrong type, a service throws, a boundary condition trips. You write a unit test, it fails deterministically, you fix it, it stays fixed.</p>
+<p>LLM agents fail in four qualitatively different ways, and most teams only instrument the first:</p>
+<ol>
+<li><strong>Format failures</strong> — the model returned valid JSON but with the wrong schema, or a tool call with a misnamed argument. Cheap to detect, catastrophic when missed because the downstream parse crashes silently or, worse, succeeds on garbage.</li>
+<li><strong>Grounding failures</strong> — the agent cited a fact not in the retrieved context, hallucinated a function signature, or invented a customer record. The output is well-formed and wrong.</li>
+<li><strong>Reasoning failures</strong> — the agent had the right context and the right tools but took the wrong path: called the wrong tool, stopped early, looped, or misranked options.</li>
+<li><strong>Capability ceilings</strong> — the task genuinely exceeds the model's reasoning ability at any price tier you can afford.</li>
+</ol>
+<p>The problem: <strong>all four look identical in your logs.</strong> A 3% error rate is four different diseases aggregated into one number. Swapping models is a blunt intervention that moves all four dials at once and tells you nothing about which one dominated.</p>
+<h3>The verification harness that actually diagnoses</h3>
+<p>The fix is a three-tier verification harness, run on every agent run in production and on every eval case offline. Each tier catches a different failure class, and each has a budget so you're not LLM-judging every trivial call.</p>
+<p><strong>Tier 1 — Deterministic checks (free, catches format + schema failures).</strong></p>
+<pre><code>def tier1_check(agent_output, expected_schema):
+    # Schema validation
+    if not validate_schema(agent_output, expected_schema):
+        return fail(&quot;SCHEMA_VIOLATION&quot;, agent_output)
+    # Tool-call argument checks against an allowlist
+    for call in agent_output.tool_calls:
+        if call.name not in TOOL_ALLOWLIST:
+            return fail(&quot;UNKNOWN_TOOL&quot;, call)
+        if missing_required_args(call):
+            return fail(&quot;MISSING_ARG&quot;, call)
+    # Regex / type guards on structured fields
+    if not re.match(ISO8601, agent_output.payload[&quot;timestamp&quot;]):
+        return fail(&quot;BAD_TIMESTAMP&quot;, agent_output.payload[&quot;timestamp&quot;])
+    return ok()</code></pre>
+<p>This tier is pure code, runs in microseconds, and catches the silent-failure class that <em>“Your MCP tool isn’t broken. Your description is”</em> was about — the agent returned something your system accepted but shouldn’t have. Most teams skip it because “the model is good at JSON now.” It is, until it isn’t, and you won’t know.</p>
+<p><strong>Tier 2 — LLM-as-judge (cheap, catches grounding + reasoning failures).</strong></p>
+<p>Run a smaller, faster model (Haiku-tier) to grade the run on a rubric, but only on the slice that passed Tier 1 and only where deterministic checks can’t reach.</p>
+<pre><code>def tier2_check(agent_output, retrieved_context, query):
+    rubric = f&quot;&quot;&quot;
+    Given the query and the retrieved context, judge the agent's answer.
+    Fail if:
+    - The answer cites a fact NOT present in retrieved_context (grounding).
+    - The answer contradicts itself across steps (reasoning).
+    - A more direct tool path was obviously available (efficiency).
+    Return: {{pass: bool, failure_type: str, evidence: str}}
+    &quot;&quot;&quot;
+    return haiku_judge(rubric, query, retrieved_context, agent_output)</code></pre>
+<p>The discipline here is <strong>don’t judge everything.</strong> Tier 2 is the most expensive tier per call. Gate it: only run the judge on outputs flagged as risky by Tier 1 heuristics (high entropy in the tool-call distribution, low retrieval confidence, long chain-of-thought with no tool use), or on a sampled 5% of traffic for calibration. Cost stays bounded; signal stays high.</p>
+<p><strong>Tier 3 — Human-in-loop (expensive, catches capability ceilings + calibrates the judge).</strong></p>
+<p>Route to a human reviewer:</p>
+<ul>
+<li>Any case where Tier 1 and Tier 2 <em>disagree</em> (Tier 1 passed but Tier 2 failed, or vice versa).</li>
+<li>Any case the user explicitly flagged (thumbs-down, retry, escalates to support).</li>
+<li>A random 0.5% sample, to detect drift in the judge itself.</li>
+</ul>
+<p>The human-labeled cases become next month’s eval set. <strong>This is the feedback loop most teams never close</strong> — production failures get triaged to a bug tracker, fixed ad hoc, and the learnings never make it back into the regression suite. Tier 3 is how you compound.</p>
+<h3>The diagnosis matrix</h3>
+<p>Once the harness is running, your “3% error rate” decomposes into something actionable:</p>
+<table>
+<thead>
+<tr><th>Failure type</th><th>Where it’s caught</th><th>What it actually means</th><th>The fix that works</th></tr>
+</thead>
+<tbody>
+<tr><td>SCHEMA_VIOLATION</td><td>Tier 1</td><td>Output contract is ambiguous or unenforced</td><td>Tighten schema + structured outputs / function-calling mode</td></tr>
+<tr><td>GROUNDING</td><td>Tier 2</td><td>Retrieved context is wrong or missing</td><td>Fix retrieval, not the model (see BM25 piece)</td></tr>
+<tr><td>REASONING</td><td>Tier 2</td><td>Agent picked a bad path with good inputs</td><td>Add a planning step or better tool descriptions</td></tr>
+<tr><td>CAPABILITY</td><td>Tier 3 (pattern)</td><td>Fails consistently even with perfect inputs</td><td><em>Now</em> consider a bigger model, with evidence</td></tr>
+</tbody>
+</table>
+<p>Notice the inversion: <strong>model upgrade is the last column, not the first.</strong> Most teams reach for it first because they have no instrumentation telling them the failure is actually in retrieval, or in the tool description, or in the schema. They pay frontier-model prices to compensate for a missing regex.</p>
+<h3>The budget gate that keeps this real</h3>
+<p>Verification without a budget becomes a tax that nobody wants to pay. Set it explicitly:</p>
+<ul>
+<li><strong>Tier 1:</strong> 100% of runs. Cost: negligible (CPU only).</li>
+<li><strong>Tier 2:</strong> ≤10% of runs, gated by risk heuristics. Cost: one Haiku-tier call per judged run — single-digit cents.</li>
+<li><strong>Tier 3:</strong> ≤1% of runs. Cost: human minutes; this is your eval-set factory, not a runtime cost center.</li>
+</ul>
+<p>Total verification overhead should land around 2–5% of your inference spend. If it’s higher, your risk-gating heuristics are too loose. If it’s lower, you’re flying blind. The point isn’t to verify everything — it’s to verify the <em>right</em> things, cheaply, with a closed feedback loop.</p>
+<h3>What changes Monday morning</h3>
+<ol>
+<li><strong>Instrument Tier 1 first, this week.</strong> Schema + tool-arg validation on every agent run. This alone will surface a class of failures you currently blame on the model.</li>
+<li><strong>Tag every production failure with its tier and type.</strong> Within two weeks you’ll have a real distribution: how much of your error rate is grounding vs reasoning vs capability. You almost certainly have the proportions wrong today.</li>
+<li><strong>Route Tier 3 samples into your eval set.</strong> Close the loop. Production becomes your highest-quality source of regression tests.</li>
+<li><strong>Re-open the model-swap decision with data.</strong> If 70% of your failures are GROUNDING, no model upgrade will fix them — fix retrieval. If 70% are CAPABILITY, now the bigger model earns its margin.</li>
+</ol>
+<h3>The through-line</h3>
+<p>This is the same lesson the reproducibility piece was about, scaled up to agents: <strong>deterministic code and probabilistic systems need different verification strategies, and bolting the wrong one onto the other is where the silent failures live.</strong> Agents don’t fail because the model is bad. They fail because the model is <em>probabilistic</em> and the surrounding system was designed as if it weren’t.</p>
+<p>Stop swapping models to fix problems you haven’t diagnosed. Build the harness, decompose the error, and let the data tell you whether you need a bigger brain or a better guardrail. Nine times out of ten it’s the guardrail.</p>
+<hr>
+<p><em>Footnote on sources: Failure-mode patterns described here are consistent with active research on verification reliability — notably recent work on verification pitfalls in speculative decoding (lossy verification silently degrading output quality) and reliability-memory mechanisms for multi-agent systems. The three-tier harness and budget-gating approach reflects established practice from production LLM-ops and evaluation engineering; adapt the exact percentages to your error distribution and cost model.</em></p>
+                </div>
+                <nav class="post-nav">
+                    <a href="/posts/bm25-is-eating-your-vector-db">&larr; No. 1: BM25 Is Eating Your Vector DB (And It Should)</a>
+                    <a href="/posts/i-gave-my-ci-a-tamagotchi">No. 8: I Gave My CI a Tamagotchi &rarr;</a>
+                </nav>
+            </div>
+        </article>
+    </main>
+    <footer class="footer">
+        <div class="container footer-inner">
+            <p>&copy; 2026 Nitish Agarwal. All rights reserved.</p>
+            <p class="footer-note">Static site · No trackers</p>
+        </div>
+    </footer>
+    <script src="/script.js"></script>
+</body>
+</html>

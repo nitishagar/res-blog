@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" role="img" aria-label="Forecasting pipeline: time-series model emits quantiles, a deterministic watcher fires on breach, Claude investigates, humans decide">
+  <rect width="1200" height="320" fill="#fafaf9"/>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9" fill="none" stroke="#ea580c" stroke-width="2"/>
+    </marker>
+  </defs>
+  <g font-family="Inter, system-ui, sans-serif" text-anchor="middle">
+    <rect x="30" y="70" width="240" height="180" rx="10" fill="#1c1917"/>
+    <text x="150" y="140" fill="#ea580c" font-size="22" font-weight="700">TSFM forecasts</text>
+    <text x="150" y="170" fill="#fafaf9" font-size="15">quantiles, continuously</text>
+    <text x="150" y="195" fill="#a8a29e" font-size="13">Timestral / Chronos</text>
+    <line x1="270" y1="160" x2="310" y2="160" stroke="#ea580c" stroke-width="2" marker-end="url(#arr)"/>
+    <rect x="310" y="70" width="240" height="180" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="2"/>
+    <text x="430" y="140" fill="#1c1917" font-size="22" font-weight="700">Deterministic</text>
+    <text x="430" y="168" fill="#1c1917" font-size="22" font-weight="700">watcher</text>
+    <text x="430" y="198" fill="#78716c" font-size="14">fires on band breach</text>
+    <line x1="550" y1="160" x2="590" y2="160" stroke="#ea580c" stroke-width="2" marker-end="url(#arr)"/>
+    <rect x="590" y="70" width="240" height="180" rx="10" fill="#ffffff" stroke="#e7e5e4" stroke-width="2"/>
+    <text x="710" y="140" fill="#1c1917" font-size="22" font-weight="700">Claude</text>
+    <text x="710" y="168" fill="#1c1917" font-size="22" font-weight="700">investigates</text>
+    <text x="710" y="198" fill="#78716c" font-size="14">logs, docs, history</text>
+    <line x1="830" y1="160" x2="870" y2="160" stroke="#ea580c" stroke-width="2" marker-end="url(#arr)"/>
+    <rect x="870" y="70" width="300" height="180" rx="10" fill="#ea580c"/>
+    <text x="1020" y="140" fill="#ffffff" font-size="22" font-weight="700">Humans decide</text>
+    <text x="1020" y="170" fill="#fff7ed" font-size="15">irreversible calls only</text>
+    <text x="1020" y="195" fill="#fff7ed" font-size="13">decisions become backtests</text>
+  </g>
+  <text x="600" y="295" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="14" fill="#78716c">Small model for numbers · large model for context · deterministic code for gates</text>
+</svg>

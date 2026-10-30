@@ -478,14 +478,27 @@ async function testBlogSystem() {
 
     try {
         const queue = JSON.parse(await fs.promises.readFile(path.join(__dirname, 'posts/queue.json'), 'utf8'));
+        const badShape = queue.posts.filter(p => p.no == null && !p.tag).map(p => p.slug);
+        if (badShape.length === 0) {
+            pass('Blog: queue shape', 'Every entry has a series no. or a tag');
+        } else {
+            fail('Blog: queue shape', `Missing no/tag: ${badShape.join(', ')}`);
+        }
         const pubs = queue.posts.filter(p => p.status === 'published')
             .sort((a, b) => (a.date < b.date ? 1 : -1));
         if (pubs.length > 0) {
-            const newest = pubs[0];
+            const newest = pubs.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))[0];
             const cover = ['.jpg', '.png']
                 .map(ext => `posts/covers/${newest.slug}${ext}`)
                 .find(f => fs.existsSync(path.join(__dirname, f)));
             const index = await fs.promises.readFile(path.join(__dirname, 'index.html'), 'utf8');
+            const feedRegion = index.split('BLOG-FEED-START')[1].split('BLOG-FEED-END')[0];
+            const firstLink = (feedRegion.match(/href="(\/posts\/[^"]+)"/) || [])[1] || '';
+            if (firstLink === `/posts/${newest.slug}`) {
+                pass('Blog: featured is newest', `${newest.slug} leads the feed`);
+            } else {
+                fail('Blog: featured is newest', `Feed leads with ${firstLink}, newest is ${newest.slug}`);
+            }
             if (cover && index.includes('blog-feature-cover') && index.includes(`/${cover}`)) {
                 pass('Blog: featured cover', `Featured shows ${cover}`);
             } else if (!cover) {
