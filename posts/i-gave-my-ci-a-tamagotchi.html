@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Gave My CI a Tamagotchi — Nitish Agarwal</title>
+    <meta name="description" content="Meta open-sourced the Muse gadget SDK, and my Arduino UNO Q had an 8x13 LED matrix doing nothing but blink boot codes. Now a pixel creature lives there: it hops when CI goes green, sulks when a deploy fails, dozes when the board runs hot.">
+    <link rel="canonical" href="https://res-blog.nitishagar.workers.dev/posts/i-gave-my-ci-a-tamagotchi">
+    <meta property="og:title" content="I Gave My CI a Tamagotchi">
+    <meta property="og:description" content="Meta open-sourced the Muse gadget SDK, and my Arduino UNO Q had an 8x13 LED matrix doing nothing but blink boot codes. Now a pixel creature lives there: it hops when CI goes green, sulks when a deploy fails, dozes when the board runs hot.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://res-blog.nitishagar.workers.dev/posts/i-gave-my-ci-a-tamagotchi">
+    <meta property="og:image" content="https://res-blog.nitishagar.workers.dev/posts/covers/i-gave-my-ci-a-tamagotchi.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="I Gave My CI a Tamagotchi">
+    <meta name="twitter:description" content="Meta open-sourced the Muse gadget SDK, and my Arduino UNO Q had an 8x13 LED matrix doing nothing but blink boot codes. Now a pixel creature lives there: it hops when CI goes green, sulks when a deploy fails, dozes when the board runs hot.">
+    <meta name="twitter:image" content="https://res-blog.nitishagar.workers.dev/posts/covers/i-gave-my-ci-a-tamagotchi.jpg">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "I Gave My CI a Tamagotchi",
+        "description": "Meta open-sourced the Muse gadget SDK, and my Arduino UNO Q had an 8x13 LED matrix doing nothing but blink boot codes. Now a pixel creature lives there: it hops when CI goes green, sulks when a deploy fails, dozes when the board runs hot.",
+        "url": "https://res-blog.nitishagar.workers.dev/posts/i-gave-my-ci-a-tamagotchi",
+        "datePublished": "2026-10-30",
+        "author": { "@type": "Person", "name": "Nitish Agarwal", "url": "https://res-blog.nitishagar.workers.dev/" },
+        "image": "https://res-blog.nitishagar.workers.dev/posts/covers/i-gave-my-ci-a-tamagotchi.jpg"
+    }
+    </script>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="/" class="logo">Nitish Agarwal<span class="logo-dot">.</span></a>
+                <ul class="nav-menu">
+                    <li><a href="/#about" class="nav-link">About</a></li>
+                    <li><a href="/#portfolio" class="nav-link">Work</a></li>
+                    <li><a href="/blog" class="nav-link">Writing</a></li>
+                    <li><a href="/#contact" class="nav-link">Contact</a></li>
+                    <li><a href="https://github.com/nitishagar" class="nav-link nav-cta" target="_blank" rel="noopener noreferrer">GitHub ↗</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main id="main-content">
+        <article class="post">
+            <div class="container post-narrow">
+                <p><a href="/blog" class="blog-link">&larr; All writing</a></p>
+                <p class="section-index">Agent reliability · No. 8</p>
+                <h1 class="post-title">I Gave My CI a Tamagotchi</h1>
+                <p class="post-dek">Meta open-sourced the Muse gadget SDK, and my Arduino UNO Q had an 8x13 LED matrix doing nothing but blink boot codes. Now a pixel creature lives there: it hops when CI goes green, sulks when a deploy fails, dozes when the board runs hot.</p>
+                <p class="post-meta">October 30, 2026 · 5 min read</p>
+                <ul class="tag-row"><li><span class="mono-tag">AI</span></li><li><span class="mono-tag">Arduino</span></li><li><span class="mono-tag">IoT</span></li><li><span class="mono-tag">Hardware</span></li><li><span class="mono-tag">Open Source</span></li></ul>
+                <figure class="post-hero"><img src="/posts/covers/i-gave-my-ci-a-tamagotchi-hero.png" alt="The muse-familiar pixel creature on an LED matrix" loading="lazy"><figcaption>Repo art for muse-familiar (owner board photo pending) — live demo with real frame data at nitishagar.github.io/muse-familiar</figcaption></figure>
+                <div class="ad-slot" data-ea-publisher="" data-ea-type="image"></div>
+                <div class="post-body">
+<h3>The matrix was just sitting there</h3>
+<p>The Arduino UNO Q is two computers pretending to be one board: a Qualcomm quad-core running Debian, and an STM32 microcontroller running Zephyr sketches. Between them sits a small blue LED matrix — 104 pixels, eight brightness levels, and, until last week, no purpose in my life.</p>
+<p>Then Meta open-sourced the <a href="https://github.com/facebookincubator/muse-gadget-sdk" target="_blank" rel="noopener noreferrer">Muse gadget SDK</a>. Muse is the assistant; a <em>gadget</em> is a machine Muse can reach — run a command, read a file, get a message into your chat. The Linux SDK turns any Debian box into one. The obvious demo is a dashboard. The correct demo is a pet.</p>
+<p>So I built <a href="https://github.com/nitishagar/muse-familiar" target="_blank" rel="noopener noreferrer">muse-familiar</a>: a small creature on the matrix, fed by webhooks. It knows seven moods and eleven kinds of news:</p>
+<table>
+<thead>
+<tr><th>It hears</th><th>It feels</th></tr>
+</thead>
+<tbody>
+<tr><td><code>ci_green</code>, <code>deploy_ok</code>, <code>merge</code></td><td>happy</td></tr>
+<tr><td><code>ci_red</code>, <code>deploy_fail</code></td><td>sad</td></tr>
+<tr><td><code>alert</code>, <code>incident</code></td><td>wide-eyed</td></tr>
+<tr><td><code>mention</code>, <code>poke</code></td><td>curious</td></tr>
+<tr><td>board hits 78 °C</td><td>sleepy</td></tr>
+</tbody>
+</table>
+<p>Pair it with Muse and the creature narrates: <em>&quot;The Familiar is now sad (event: deploy_fail).&quot;</em> And the direction that matters works too — <em>&quot;make the Familiar happy&quot;</em> is now a sentence my assistant understands and can act on. <strong>An assistant with a body it can cheer up behaves differently than one with only a text box.</strong> I can't prove that yet. I check on the creature more than I check the dashboard, though.</p>
+<h3>The constraint that made it fun</h3>
+<p>The two brains talk over the board's message router, and the router caps messages around <strong>256 bytes</strong>. One animation frame is 104 characters. You can do that math: two frames per message, never three.</p>
+<p>So the protocol chunks. <code>begin</code> (how many frames, how fast) → <code>chunk</code> (two frames, base-104 art) → <code>play</code>. Round trip measured at <strong>19 milliseconds</strong>. Constraints like this are a gift — the protocol wrote itself once the number was known, and &quot;make it fit in 256 bytes&quot; settled every design argument before it started.</p>
+<h3>The safety lives in the part that can't crash</h3>
+<p>Here's the part I actually want to argue. A creature that flashes at 30 fps when your engine dies isn't a gadget, it's a photosensitivity hazard on a desk. So the question is: where does the cap live?</p>
+<p>The tempting answer is the engine. The engine is Python, it's right there, add a rate limiter. But the engine is exactly the component that fails — that's the scenario we're designing for. Every layer above the hardware shares one property: <strong>they can all die together.</strong> The only clamp that survives a crash is the one below every layer that can fail.</p>
+<p>So the clamps live in the Zephyr sketch, burned into the same firmware that draws the pixels: <strong>minimum 250 ms per frame (≤4 fps), maximum 64 frames, 3-bit grayscale, and a 30-second idle timeout.</strong> The engine sends a heartbeat with every animation. If the heartbeat stops — crash, kill -9, power brownout, whatever — the sketch doesn't strobe and doesn't guess. It draws a dim sleeping glyph and waits for a competent adult.</p>
+<p>We test it the way it will actually fail: SIGKILL the engine mid-show, on the board. The systemd unit restarts it, and while it's down the matrix dims to the nap glyph. No strobe, no half-drawn face frozen mid-hop. <strong>The engine has opinions. The sketch has laws.</strong> A mood engine is allowed to be moody; the thing driving photons is not.</p>
+<p>The webhook gets the same treatment — key'd, 2 KiB body cap, 12 requests a minute, bounded queue — but those are conventional. The MCU clamp is the one people skip, because the dumb component feels beneath architecture. It's the opposite: the dumb component is the last line that still works when everything smart is dead.</p>
+<h3>Build your own in three commands</h3>
+<ol>
+<li>Clone and flash: <code>git clone https://github.com/nitishagar/muse-familiar ~/muse-familiar &amp;&amp; cd ~/muse-familiar</code>, then <code>firmware/upload.sh</code> (needs the board's password, typed not stored).</li>
+<li><code>scripts/install.sh</code> — generates the webhook key, links the systemd unit, done. Dry-run first with <code>--check</code>.</li>
+<li>Make it hop: <code>python3 -m familiar.cli feed ci_green</code> — or <code>curl -X POST localhost:8123/poke -H &quot;X-Familiar-Key: $(cat ~/.config/familiar/key)&quot; -d '{&quot;kind&quot;:&quot;ci_green&quot;}'</code>.</li>
+</ol>
+<p>The <a href="https://nitishagar.github.io/muse-familiar/" target="_blank" rel="noopener noreferrer">landing page</a> plays the <em>actual</em> frame data in your browser, so you can meet the creature before owning a board. MIT, open source, and the repo ships a GitHub Action and a Home Assistant snippet for feeding it from things that aren't your terminal.</p>
+<h3>Takeaway</h3>
+<p>Nobody needs a tamagotchi for their CI. That's the point. The fastest way I've found to actually learn a new SDK is to give it something with feelings to take care of — every design decision gets sharper when the thing on the other end has a face. Somewhere between the 256-byte cap and the kill test, the Muse SDK stopped being documentation and became a pet.</p>
+<p>Assistants are getting bodies — speakers, wearables, robots, desk toys. Before you build the serious one, build the silly one. You'll discover where the safety has to live, and it's never where the smart code runs.</p>
+<p><strong>Give your assistant something to take care of.</strong></p>
+<hr>
+<h3>Sources</h3>
+<ul>
+<li><a href="https://github.com/nitishagar/muse-familiar" target="_blank" rel="noopener noreferrer">muse-familiar</a> — source, architecture, and the full research/plan/validation trail in <code>thoughts/</code></li>
+<li><a href="https://nitishagar.github.io/muse-familiar/" target="_blank" rel="noopener noreferrer">Live landing page</a> — the real frame data, playable in-browser</li>
+<li><a href="https://github.com/facebookincubator/muse-gadget-sdk" target="_blank" rel="noopener noreferrer">facebookincubator/muse-gadget-sdk</a> — Meta's open-source Muse gadget SDK (Apache-2.0)</li>
+<li><a href="https://gadgets.muse.ai/" target="_blank" rel="noopener noreferrer">gadgets.muse.ai</a> — the Muse gadget platform</li>
+<li><a href="https://docs.arduino.cc/hardware/uno-q/" target="_blank" rel="noopener noreferrer">Arduino UNO Q</a> — the dual-brain board</li>
+</ul>
+                </div>
+                <nav class="post-nav">
+                    
+                    
+                </nav>
+            </div>
+        </article>
+    </main>
+    <footer class="footer">
+        <div class="container footer-inner">
+            <p>&copy; 2026 Nitish Agarwal. All rights reserved.</p>
+            <p class="footer-note">Static site · No trackers</p>
+        </div>
+    </footer>
+    <script src="/script.js"></script>
+</body>
+</html>
